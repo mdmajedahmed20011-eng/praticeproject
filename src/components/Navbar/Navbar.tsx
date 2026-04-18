@@ -2,9 +2,12 @@
 
 import Link from 'next/link';
 import { Search, User, ShoppingBag, Menu } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
+  const { cartCount } = useCart();
+
   return (
     <header className={styles.header}>
       {/* Announcement Bar */}
@@ -53,9 +56,12 @@ export default function Navbar() {
           <button className={styles.iconButton} aria-label="Account">
             <User size={22} strokeWidth={1.5} />
           </button>
-          <button className={styles.iconButton} aria-label="Cart">
+          <Link href="/checkout" className={styles.iconButton} aria-label="Cart" style={{ position: 'relative' }}>
             <ShoppingBag size={22} strokeWidth={1.5} />
-          </button>
+            {cartCount > 0 && (
+              <span className={styles.cartBadge}>{cartCount}</span>
+            )}
+          </Link>
         </div>
       </nav>
     </header>

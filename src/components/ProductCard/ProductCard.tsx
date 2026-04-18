@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { Heart, Eye } from 'lucide-react';
 import styles from './ProductCard.module.css';
 
@@ -14,7 +15,7 @@ export interface ProductProps {
 export default function ProductCard({ product }: { product: ProductProps }) {
   return (
     <div className={styles.productCard}>
-      <div className={styles.imageWrapper}>
+      <Link href={`/product/${product.id}`} className={styles.imageWrapper} style={{ display: 'block' }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img 
           src={product.image} 
@@ -23,16 +24,16 @@ export default function ProductCard({ product }: { product: ProductProps }) {
         />
         
         {/* Wishlist Heart Icon */}
-        <button className={styles.heartIcon} aria-label="Add to wishlist">
+        <button className={styles.heartIcon} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
           <Heart size={20} strokeWidth={1.5} />
         </button>
 
         {/* Quick View Button */}
-        <button className={styles.quickViewBtn}>
+        <button className={styles.quickViewBtn} onClick={(e) => e.preventDefault()}>
           <Eye size={16} strokeWidth={1.5} />
           QUICK VIEW
         </button>
-      </div>
+      </Link>
 
       <div className={styles.details}>
         <h3 className={styles.title}>{product.title}</h3>
