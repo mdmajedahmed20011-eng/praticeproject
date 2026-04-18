@@ -1,0 +1,126 @@
+.header {
+  width: 100%;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: var(--background);
+}
+
+/* Announcement Bar */
+.announcement {
+  background-color: #111; /* Deep luxurious black */
+  color: #fff;
+  padding: 8px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.announcementLeft a {
+  margin-right: 15px;
+  opacity: 0.8;
+  transition: opacity 0.3s ease;
+}
+
+.announcementLeft a:hover {
+  opacity: 1;
+}
+
+.announcementCenter {
+  font-weight: 500;
+  letter-spacing: 0.1em;
+}
+
+.announcementRight {
+  display: flex;
+  gap: 15px;
+}
+
+/* Main Navbar */
+.navContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.logo span {
+  font-weight: 300;
+}
+
+.navLinks {
+  display: flex;
+  gap: 32px;
+}
+
+.navLink {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.navLink::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 1px;
+  bottom: 0;
+  left: 0;
+  background-color: currentColor;
+  transition: width 0.3s var(--transition-smooth);
+}
+
+.navLink:hover::after {
+  width: 100%;
+}
+
+.navIcons {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+}
+
+.iconButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  transition: transform 0.3s ease;
+}
+
+.iconButton:hover {
+  transform: translateY(-2px);
+}
+
+@media (max-width: 1024px) {
+  .navLinks {
+    display: none; /* We will implement a hamburger menu later for mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .announcementLeft, .announcementRight {
+    display: none;
+  }
+  .announcementCenter {
+    width: 100%;
+    text-align: center;
+  }
+  .navContainer {
+    padding: 15px 20px;
+  }
+}
