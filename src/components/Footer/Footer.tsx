@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { Instagram, Facebook, Twitter, Youtube } from 'lucide-react';
+import { Instagram, Facebook, Linkedin, Youtube } from 'lucide-react';
 import styles from './Footer.module.css';
 
 export default function Footer() {
@@ -18,7 +18,7 @@ export default function Footer() {
           <div className={styles.socialLinks}>
             <a href="#" className={styles.socialIcon}><Instagram size={20} /></a>
             <a href="#" className={styles.socialIcon}><Facebook size={20} /></a>
-            <a href="#" className={styles.socialIcon}><Twitter size={20} /></a>
+            <a href="#" className={styles.socialIcon}><Linkedin size={20} /></a>
             <a href="#" className={styles.socialIcon}><Youtube size={20} /></a>
           </div>
         </div>
