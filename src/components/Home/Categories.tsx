@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import styles from './Categories.module.css';
 
@@ -31,20 +32,21 @@ export default function Categories() {
         }}
       >
         {categories.map((cat) => (
-          <motion.div 
-            key={cat.id} 
-            className={styles.categoryCard}
-            variants={{
-              hidden: { opacity: 0, y: 30 },
-              visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
-            }}
-          >
-            <div className={styles.imageWrapper}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={cat.image} alt={cat.title} className={styles.categoryImage} />
-            </div>
-            <h3 className={styles.categoryTitle}>{cat.title}</h3>
-          </motion.div>
+          <Link href="/collections" key={cat.id} style={{textDecoration: 'none'}}>
+            <motion.div 
+              className={styles.categoryCard}
+              variants={{
+                hidden: { opacity: 0, y: 30 },
+                visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+              }}
+            >
+              <div className={styles.imageWrapper}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={cat.image} alt={cat.title} className={styles.categoryImage} />
+              </div>
+              <h3 className={styles.categoryTitle}>{cat.title}</h3>
+            </motion.div>
+          </Link>
         ))}
       </motion.div>
     </section>

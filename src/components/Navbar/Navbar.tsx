@@ -36,12 +36,12 @@ export default function Navbar() {
 
         {/* Navigation Links */}
         <div className={styles.navLinks}>
-          <Link href="/new" className={styles.navLink}>New In</Link>
-          <Link href="/women" className={styles.navLink}>Women</Link>
-          <Link href="/men" className={styles.navLink}>Men</Link>
-          <Link href="/kids" className={styles.navLink}>Kids</Link>
-          <Link href="/home" className={styles.navLink}>Home & Decor</Link>
-          <Link href="/beauty" className={styles.navLink}>Beauty</Link>
+          <Link href="/collections" className={styles.navLink}>New In</Link>
+          <Link href="/collections" className={styles.navLink}>Women</Link>
+          <Link href="/collections" className={styles.navLink}>Men</Link>
+          <Link href="/collections" className={styles.navLink}>Kids</Link>
+          <Link href="/collections" className={styles.navLink}>Home & Decor</Link>
+          <Link href="/collections" className={styles.navLink}>Beauty</Link>
           <Link href="/sale" className={styles.navLink} style={{ color: '#d32f2f' }}>Sale</Link>
         </div>
 
