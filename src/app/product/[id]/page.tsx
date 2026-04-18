@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { Heart, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import styles from './page.module.css';
@@ -26,22 +27,30 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const product = mockProducts[params.id] || mockProducts['e1'];
   
   const { addToCart } = useCart();
+  const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[1]);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [openAccordion, setOpenAccordion] = useState<string | null>('details');
 
+  const getCartItem = () => ({
+    id: `${product.id}-${selectedSize}-${selectedColor}`,
+    productId: product.id,
+    title: product.title,
+    price: product.price,
+    image: product.images[0],
+    size: selectedSize,
+    color: selectedColor,
+    quantity: 1
+  });
+
   const handleAddToCart = () => {
-    addToCart({
-      id: `${product.id}-${selectedSize}-${selectedColor}`,
-      productId: product.id,
-      title: product.title,
-      price: product.price,
-      image: product.images[0],
-      size: selectedSize,
-      color: selectedColor,
-      quantity: 1
-    });
+    addToCart(getCartItem());
+  };
+
+  const handleBuyNow = () => {
+    addToCart(getCartItem());
+    router.push('/checkout');
   };
 
   return (
@@ -114,10 +123,13 @@ export default function ProductPage({ params }: { params: { id: string } }) {
           </div>
         </div>
 
-        {/* Add to Cart CTA */}
+        {/* Add to Cart / Buy Now CTA */}
         <div className={styles.actionRow}>
           <button className={styles.addToCart} onClick={handleAddToCart}>
-            Add to Cart
+            Add to Bag
+          </button>
+          <button className={styles.buyNow} onClick={handleBuyNow}>
+            Buy Now
           </button>
           <button className={styles.wishlistBtn} aria-label="Add to Wishlist">
             <Heart size={24} strokeWidth={1} />

@@ -1,7 +1,8 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
-import { SlidersHorizontal } from 'lucide-react';
+import { SlidersHorizontal, X } from 'lucide-react';
 import ProductCard from '../../components/ProductCard/ProductCard';
 import styles from './page.module.css';
 
@@ -28,6 +29,20 @@ const executiveData = [
 ];
 
 export default function CollectionsPage() {
+  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+
+  // All colors present in mock data
+  const availableColors = ['#ffffff', '#000000', '#4ade80', '#67e8f9', '#f87171', '#d1d5db', '#ea580c', '#9ca3af', '#4b5563', '#6b7280'];
+
+  const filterData = (data: any[]) => {
+    if (!activeFilter) return data;
+    return data.filter(item => item.colors && item.colors.includes(activeFilter));
+  };
+
+  const filteredEthnic = filterData(ethnicData);
+  const filteredCasual = filterData(casualData);
+  const filteredExecutive = filterData(executiveData);
+
   return (
     <div className={styles.collectionPage}>
       
@@ -36,17 +51,28 @@ export default function CollectionsPage() {
         <Link href="/">Home</Link> / <Link href="/men">Men</Link> / <span>Shirts</span>
       </div>
 
-      {/* Filter Bar */}
       <div className={styles.filterBar}>
-        <button className={`${styles.filterBtn} ${styles.active}`}>
-          <SlidersHorizontal size={14} /> Filters
+        <button className={`${styles.filterBtn} ${activeFilter ? styles.active : ''}`} onClick={() => setActiveFilter(null)}>
+          <SlidersHorizontal size={14} /> {activeFilter ? 'Clear Filter' : 'All Colors'}
         </button>
-        <button className={styles.filterBtn}>Categories</button>
-        <button className={styles.filterBtn}>Colour</button>
-        <button className={styles.filterBtn}>Fabric</button>
-        <button className={styles.filterBtn}>Price</button>
-        <button className={styles.filterBtn}>Size</button>
-        <button className={styles.filterBtn}>Cut / Fit</button>
+      </div>
+
+      {/* Active Color Swatches Banner */}
+      <div style={{ display: 'flex', gap: '10px', padding: '10px 20px', overflowX: 'auto', marginBottom: '20px' }}>
+        {availableColors.map(color => (
+          <button 
+            key={color} 
+            className={activeFilter === color ? styles.activeSwatch : styles.swatchBtn}
+            style={{ 
+              backgroundColor: color, 
+              width: 30, height: 30, borderRadius: '50%', 
+              border: activeFilter === color ? '2px solid #111' : '1px solid #ddd',
+              cursor: 'pointer'
+            }}
+            onClick={() => setActiveFilter(color === activeFilter ? null : color)}
+            title="Filter by color"
+          />
+        ))}
       </div>
 
       {/* ETHNIC Section */}
@@ -56,9 +82,9 @@ export default function CollectionsPage() {
           <Link href="#" className={styles.viewAll}>View All</Link>
         </div>
         <div className={styles.productGrid}>
-          {ethnicData.map((item) => (
+          {filteredEthnic.length > 0 ? filteredEthnic.map((item) => (
             <ProductCard key={item.id} product={item} />
-          ))}
+          )) : <p style={{ gridColumn: '1 / -1', padding: '20px', color: '#666' }}>No products match this color.</p>}
         </div>
       </section>
 
@@ -69,9 +95,9 @@ export default function CollectionsPage() {
           <Link href="#" className={styles.viewAll}>View All</Link>
         </div>
         <div className={styles.productGrid}>
-          {casualData.map((item) => (
+          {filteredCasual.length > 0 ? filteredCasual.map((item) => (
             <ProductCard key={item.id} product={item} />
-          ))}
+          )) : <p style={{ gridColumn: '1 / -1', padding: '20px', color: '#666' }}>No products match this color.</p>}
         </div>
       </section>
 
@@ -82,9 +108,9 @@ export default function CollectionsPage() {
           <Link href="#" className={styles.viewAll}>View All</Link>
         </div>
         <div className={styles.productGrid}>
-          {executiveData.map((item) => (
+          {filteredExecutive.length > 0 ? filteredExecutive.map((item) => (
             <ProductCard key={item.id} product={item} />
-          ))}
+          )) : <p style={{ gridColumn: '1 / -1', padding: '20px', color: '#666' }}>No products match this color.</p>}
         </div>
       </section>
 

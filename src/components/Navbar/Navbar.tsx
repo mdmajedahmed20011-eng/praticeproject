@@ -6,7 +6,7 @@ import { useCart } from '@/context/CartContext';
 import styles from './Navbar.module.css';
 
 export default function Navbar() {
-  const { cartCount } = useCart();
+  const { cartCount, openCart } = useCart();
 
   return (
     <header className={styles.header}>
@@ -56,12 +56,12 @@ export default function Navbar() {
           <button className={styles.iconButton} aria-label="Account">
             <User size={22} strokeWidth={1.5} />
           </button>
-          <Link href="/checkout" className={styles.iconButton} aria-label="Cart" style={{ position: 'relative' }}>
+          <button className={styles.iconButton} aria-label="Cart" onClick={openCart} style={{ position: 'relative' }}>
             <ShoppingBag size={22} strokeWidth={1.5} />
             {cartCount > 0 && (
               <span className={styles.cartBadge}>{cartCount}</span>
             )}
-          </Link>
+          </button>
         </div>
       </nav>
     </header>

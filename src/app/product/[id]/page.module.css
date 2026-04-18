@@ -158,9 +158,9 @@
 
 .addToCart {
   flex: 1;
-  background-color: var(--accent);
-  color: #fff;
-  border: none;
+  background-color: var(--background);
+  color: #111;
+  border: 1px solid #111;
   padding: 18px 0;
   font-size: 0.9rem;
   font-weight: 600;
@@ -171,7 +171,26 @@
 }
 
 .addToCart:hover {
+  background-color: #f4f5f6;
+}
+
+.buyNow {
+  flex: 1;
+  background-color: var(--accent);
+  color: #fff;
+  border: 1px solid var(--accent);
+  padding: 18px 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.buyNow:hover {
   background-color: #333;
+  border-color: #333;
 }
 
 .wishlistBtn {
