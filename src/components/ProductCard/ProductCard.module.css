@@ -1,0 +1,109 @@
+.productCard {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  cursor: pointer;
+  position: relative;
+  margin-bottom: 24px;
+}
+
+.imageWrapper {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3/4;
+  background-color: #f4f5f6; /* Typical soft gray studio bg */
+  overflow: hidden;
+  margin-bottom: 12px;
+}
+
+.productImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+.productCard:hover .productImage {
+  transform: scale(1.03);
+}
+
+.heartIcon {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: #111;
+  opacity: 0.7;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.heartIcon:hover {
+  opacity: 1;
+  transform: scale(1.1);
+}
+
+.quickViewBtn {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  padding: 12px 0;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 10;
+}
+
+.productCard:hover .quickViewBtn {
+  transform: translateY(0);
+}
+
+.quickViewBtn:hover {
+  background-color: rgba(0, 0, 0, 0.85);
+}
+
+.details {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.title {
+  font-size: 0.85rem;
+  font-weight: 600; /* Bold title like Aarong */
+  color: var(--foreground);
+  line-height: 1.4;
+}
+
+.price {
+  font-size: 0.85rem;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+.swatches {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 1px solid rgba(0,0,0,0.1);
+}
