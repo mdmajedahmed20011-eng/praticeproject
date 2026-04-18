@@ -39,11 +39,11 @@ export default function Categories() {
               visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
             }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={cat.image} alt={cat.title} className={styles.categoryImage} />
-            <div className={styles.categoryOverlay}>
-              <h3 className={styles.categoryTitle}>{cat.title}</h3>
+            <div className={styles.imageWrapper}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={cat.image} alt={cat.title} className={styles.categoryImage} />
             </div>
+            <h3 className={styles.categoryTitle}>{cat.title}</h3>
           </motion.div>
         ))}
       </motion.div>

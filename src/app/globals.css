@@ -1,20 +1,11 @@
 :root {
   --background: #ffffff;
-  --foreground: #000000;
-  --secondary: #f4f4f4;
-  --accent: #2e2e2e;
+  --foreground: #111111;
+  --secondary: #f9f9f9;
+  --accent: #000000;
   --font-primary: 'Inter', sans-serif;
   --transition-smooth: cubic-bezier(0.85, 0, 0.15, 1);
   --page-max-width: 1440px;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #000000;
-    --foreground: #ffffff;
-    --secondary: #121212;
-    --accent: #e5e5e5;
-  }
 }
 
 * {
