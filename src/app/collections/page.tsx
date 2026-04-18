@@ -9,13 +9,13 @@ import styles from './page.module.css';
 // Mock data structured similarly to the screenshot
 const ethnicData = [
   { id: 'e1', title: 'White/Green Printed Cotton Shirt', price: 854.55, image: 'https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=500&q=80', colors: ['#4ade80', '#ffffff'] },
-  { id: 'e2', title: 'Light Cyan Printed Cotton Shirt', price: 1109.09, image: 'https://images.unsplash.com/photo-1596755094514-f87e32f6b717?w=500&q=80', colors: ['#67e8f9'] },
+  { id: 'e2', title: 'Light Cyan Printed Cotton Shirt', price: 1109.09, compareAtPrice: 1450.00, stockStatus: 'low', image: 'https://images.unsplash.com/photo-1596755094514-f87e32f6b717?w=500&q=80', colors: ['#67e8f9'] },
   { id: 'e3', title: 'Light Cyan Printed Cotton Shirt', price: 863.64, image: 'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&q=80', colors: ['#f87171', '#d1d5db', '#000000'] },
-  { id: 'e4', title: 'White Printed Cotton Shirt', price: 896.45, image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=500&q=80', colors: [] },
+  { id: 'e4', title: 'White Printed Cotton Shirt', price: 896.45, compareAtPrice: 1200.00, image: 'https://images.unsplash.com/photo-1581655353564-df123a1eb820?w=500&q=80', colors: [] },
 ];
 
 const casualData = [
-  { id: 'c1', title: 'White/Blue Striped Custom Fitted Shirt', price: 1536.36, image: 'https://images.unsplash.com/photo-1620012253295-c159ce22378cd?w=500&q=80', colors: [] },
+  { id: 'c1', title: 'White/Blue Striped Custom Fitted Shirt', price: 1536.36, compareAtPrice: 1999.00, stockStatus: 'low', image: 'https://images.unsplash.com/photo-1620012253295-c159ce22378cd?w=500&q=80', colors: [] },
   { id: 'c2', title: 'White/Purple Textured Custom Fitted Shirt', price: 1540.91, image: 'https://images.unsplash.com/photo-1598032895397-b9472444bf93?w=500&q=80', colors: [] },
   { id: 'c3', title: 'Khaki Cotton Fitted Shirt', price: 1568.18, image: 'https://images.unsplash.com/photo-1593998066526-65fcab3021a2?w=500&q=80', colors: ['#ea580c', '#9ca3af', '#4b5563'] },
   { id: 'c4', title: 'Multicolour Printed Cotton Fitted Shirt', price: 1004.55, image: 'https://images.unsplash.com/photo-1578932750294-f5075e85f44a?w=500&q=80', colors: [] },

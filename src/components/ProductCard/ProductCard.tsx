@@ -10,6 +10,8 @@ export interface ProductProps {
   id: string;
   title: string;
   price: number;
+  compareAtPrice?: number;
+  stockStatus?: 'low' | 'normal';
   image: string;
   colors?: string[];
 }
@@ -23,10 +25,19 @@ export default function ProductCard({ product }: { product: ProductProps }) {
     setIsModalOpen(true);
   };
 
+  const discountPercentage = product.compareAtPrice 
+    ? Math.round(((product.compareAtPrice - product.price) / product.compareAtPrice) * 100) 
+    : 0;
+
   return (
     <>
       <div className={styles.productCard}>
         <Link href={`/product/${product.id}`} className={styles.imageWrapper} style={{ display: 'block' }}>
+          {/* Sale Badge overlay */}
+          {product.compareAtPrice && product.price < product.compareAtPrice && (
+            <div className={styles.saleBadge}>Sale</div>
+          )}
+
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img 
             src={product.image} 
@@ -34,33 +45,44 @@ export default function ProductCard({ product }: { product: ProductProps }) {
             className={styles.productImage} 
           />
           
-          {/* Wishlist Heart Icon */}
+          {/* Wishlist Heart Icon (Top Right) */}
           <button className={styles.heartIcon} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
-            <Heart size={20} strokeWidth={1.5} />
+            <Heart size={20} strokeWidth={1} />
           </button>
 
-          {/* Quick View Button */}
-          <button className={styles.quickViewBtn} onClick={handleQuickView}>
-            <Eye size={16} strokeWidth={1.5} />
-            QUICK VIEW
+          {/* Quick View Floating Button (Bottom Right) */}
+          <button className={styles.floatingEyeBtn} onClick={handleQuickView} aria-label="Quick View">
+            <Eye size={18} strokeWidth={1.5} />
           </button>
         </Link>
 
+        {/* Minimalist Details Below */}
         <div className={styles.details}>
-          <h3 className={styles.title}>{product.title}</h3>
-          <p className={styles.price}>Tk {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</p>
-          
-          {/* Color Swatches */}
-          {product.colors && product.colors.length > 0 && (
-            <div className={styles.swatches}>
-              {product.colors.map((color, index) => (
-                <div 
-                  key={index} 
-                  className={styles.swatch} 
-                  style={{ backgroundColor: color }} 
-                  title={color}
-                />
-              ))}
+          <div className={styles.titleRow}>
+            <button className={styles.bottomHeartIcon} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
+              <Heart size={20} strokeWidth={1.2} />
+            </button>
+            <h3 className={styles.title}>{product.title}</h3>
+            <button className={styles.bottomHeartIcon} style={{ visibility: 'hidden' }}><Heart size={20}/></button> {/* Balance */}
+          </div>
+
+          <div className={styles.pricingRow}>
+            <span className={styles.price}>Tk {product.price.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            {product.compareAtPrice && (
+              <>
+                <span className={styles.comparePrice}>Tk {product.compareAtPrice.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+                <span className={styles.discountBadge}>{discountPercentage}% OFF</span>
+              </>
+            )}
+          </div>
+
+          {/* Scarcity Bar */}
+          {product.stockStatus === 'low' && (
+            <div className={styles.scarcityContainer}>
+              <div className={styles.scarcityLabel}>Only Few Left</div>
+              <div className={styles.scarcityBarWrapper}>
+                <div className={styles.scarcityBarFill}></div>
+              </div>
             </div>
           )}
         </div>

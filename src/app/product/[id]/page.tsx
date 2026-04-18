@@ -1,10 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Heart, ChevronDown, ChevronUp, ShieldCheck } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
+import { useRecentlyViewed } from '@/hooks/useRecentlyViewed';
+import RecentlyViewed from '@/components/RecentlyViewed/RecentlyViewed';
 import styles from './page.module.css';
 
 // Mock DB 
@@ -27,11 +29,22 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   const product = mockProducts[params.id] || mockProducts['e1'];
   
   const { addToCart } = useCart();
+  const { addViewedItem } = useRecentlyViewed();
   const router = useRouter();
   const [activeImage, setActiveImage] = useState(0);
   const [selectedSize, setSelectedSize] = useState(product.sizes[1]);
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [openAccordion, setOpenAccordion] = useState<string | null>('details');
+
+  useEffect(() => {
+    addViewedItem({
+      id: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.images[0]
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product.id]);
 
   const getCartItem = () => ({
     id: `${product.id}-${selectedSize}-${selectedColor}`,
@@ -54,6 +67,7 @@ export default function ProductPage({ params }: { params: { id: string } }) {
   };
 
   return (
+    <>
     <div className={styles.productPage}>
       
       {/* LEFT: Image Gallery */}
@@ -171,5 +185,8 @@ export default function ProductPage({ params }: { params: { id: string } }) {
 
       </div>
     </div>
+    
+    <RecentlyViewed />
+    </>
   );
 }

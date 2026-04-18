@@ -1,0 +1,29 @@
+.container {
+  max-width: var(--page-max-width);
+  margin: 60px auto 40px auto;
+  padding: 0 20px;
+  background-color: var(--background);
+}
+
+.title {
+  text-align: center;
+  font-size: 1.5rem;
+  font-weight: 400; /* Minimalist Title */
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+  color: #111;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid {
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 15px;
+  }
+}

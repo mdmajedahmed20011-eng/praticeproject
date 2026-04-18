@@ -1,109 +1,174 @@
 .productCard {
   display: flex;
   flex-direction: column;
-  width: 100%;
-  cursor: pointer;
+  gap: 12px;
   position: relative;
-  margin-bottom: 24px;
+  width: 100%;
 }
 
 .imageWrapper {
   position: relative;
   width: 100%;
   aspect-ratio: 3/4;
-  background-color: #f4f5f6; /* Typical soft gray studio bg */
   overflow: hidden;
-  margin-bottom: 12px;
+  background-color: #f4f5f6;
+  border-radius: 4px; /* Optional subtle rounding */
 }
 
 .productImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.6s cubic-bezier(0.85, 0, 0.15, 1);
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
-.productCard:hover .productImage {
-  transform: scale(1.03);
+.imageWrapper:hover .productImage {
+  transform: scale(1.05);
 }
 
-.heartIcon {
+/* Sale Badge (Top Left) */
+.saleBadge {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  background: transparent;
-  color: #111;
-  opacity: 0.7;
-  transition: opacity 0.3s ease, transform 0.3s ease;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.heartIcon:hover {
-  opacity: 1;
-  transform: scale(1.1);
-}
-
-.quickViewBtn {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: rgba(0, 0, 0, 0.6);
-  color: #fff;
-  padding: 12px 0;
-  text-align: center;
+  top: 10px;
+  left: 10px;
+  background-color: #c96e6e; /* Dusty rose color from screenshot */
+  color: white;
+  padding: 4px 10px;
   font-size: 0.75rem;
   font-weight: 500;
+  z-index: 2;
   letter-spacing: 0.05em;
-  text-transform: uppercase;
+}
+
+/* Floating Eye Button (Bottom Right) */
+.floatingEyeBtn {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #111;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  transform: translateY(100%);
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 10;
+  cursor: pointer;
+  z-index: 2;
+  opacity: 0;
+  transform: translateY(10px);
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.productCard:hover .quickViewBtn {
+.imageWrapper:hover .floatingEyeBtn {
+  opacity: 1;
   transform: translateY(0);
 }
 
-.quickViewBtn:hover {
-  background-color: rgba(0, 0, 0, 0.85);
+.floatingEyeBtn:hover {
+  background-color: #111;
+  color: #fff;
 }
 
+/* Legacy Top Right Heart (Hidden but kept for flexibility if needed, or we hide it) */
+.heartIcon {
+  display: none; 
+}
+
+/* Details Section */
 .details {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
+}
+
+.titleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bottomHeartIcon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #111;
+  padding: 2px 0 0 0;
+  transition: color 0.2s;
+  display: flex;
+}
+
+.bottomHeartIcon:hover {
+  color: #ff4444;
 }
 
 .title {
-  font-size: 0.85rem;
-  font-weight: 600; /* Bold title like Aarong */
-  color: var(--foreground);
+  font-size: 0.9rem;
+  font-weight: 400; /* Minimalist un-bolded font */
+  color: #333;
   line-height: 1.4;
+  margin: 0;
+  flex: 1;
+}
+
+/* Pricing */
+.pricingRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 30px; /* Aligns with text if heart is 20px */
 }
 
 .price {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111;
+}
+
+.comparePrice {
   font-size: 0.85rem;
-  color: #333;
-  margin-bottom: 6px;
+  color: #888;
+  text-decoration: line-through;
 }
 
-.swatches {
+.discountBadge {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+/* Scarcity Bar */
+.scarcityContainer {
+  margin-top: 5px;
   display: flex;
-  gap: 6px;
   align-items: center;
+  gap: 10px;
 }
 
-.swatch {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  border: 1px solid rgba(0,0,0,0.1);
+.scarcityLabel {
+  background-color: #b91c1c;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 3px 8px;
+  text-transform: uppercase;
+}
+
+.scarcityBarWrapper {
+  flex: 1;
+  height: 6px;
+  background-color: #e5e7eb;
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.scarcityBarFill {
+  width: 20%;
+  height: 100%;
+  background-color: #b91c1c;
 }
