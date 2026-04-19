@@ -3,18 +3,19 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const { id } = await params;
     const data = await req.json();
     const { status, trackingId, adminNotes } = data;
 
     const order = await prisma.order.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         status,
         trackingId,
