@@ -6,7 +6,7 @@ const libsql = createClient({
   url: 'file:dev.db',
 });
 
-const adapter = new PrismaLibSql(libsql);
+const adapter = new PrismaLibSql(libsql as any);
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
