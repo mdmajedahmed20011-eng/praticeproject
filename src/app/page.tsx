@@ -8,8 +8,7 @@ import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
   await connection();
-
-  const settings = await prisma.siteSetting.findUnique({ where: { id: "global" } }) || {
+  const fallbackSettings = {
     heroHeadline: "Elevate Your Style",
     heroSubheadline: "Discover the 2026 Premium Collection",
     heroImage: "https://images.unsplash.com/photo-1596755094514-f87e32f6b717?w=1200",
@@ -19,6 +18,14 @@ export default async function Home() {
     showBestSellers: true,
     maintenanceMode: false
   };
+  let settings = fallbackSettings;
+
+  try {
+    const dbSettings = await prisma.siteSetting.findUnique({ where: { id: "global" } });
+    if (dbSettings) settings = dbSettings;
+  } catch (error) {
+    console.error('[HOME_SETTINGS_READ]', error);
+  }
 
   if (settings.maintenanceMode) {
     return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>

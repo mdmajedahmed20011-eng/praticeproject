@@ -6,20 +6,29 @@ import DashboardCharts from './DashboardCharts';
 
 export default async function AdminDashboard() {
   await connection();
+  let totalOrders = 0;
+  let totalProducts = 0;
+  let lowStockProducts = 0;
+  let totalRevenue = 0;
+  let recentOrders: any[] = [];
 
-  const [totalOrders, totalProducts, lowStockProducts, recentOrders] = await Promise.all([
-    prisma.order.count(),
-    prisma.product.count(),
-    prisma.product.count({ where: { stock: { lt: 5 } } }),
-    prisma.order.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 5,
-      include: { customer: true }
-    })
-  ]);
+  try {
+    [totalOrders, totalProducts, lowStockProducts, recentOrders] = await Promise.all([
+      prisma.order.count(),
+      prisma.product.count(),
+      prisma.product.count({ where: { stock: { lt: 5 } } }),
+      prisma.order.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 5,
+        include: { customer: true }
+      })
+    ]);
 
-  const allOrders = await prisma.order.findMany({ select: { totalAmount: true }});
-  const totalRevenue = allOrders.reduce((acc: number, order: { totalAmount: number }) => acc + order.totalAmount, 0);
+    const allOrders = await prisma.order.findMany({ select: { totalAmount: true }});
+    totalRevenue = allOrders.reduce((acc: number, order: { totalAmount: number }) => acc + order.totalAmount, 0);
+  } catch (error) {
+    console.error('[ADMIN_DASHBOARD_READ]', error);
+  }
 
   // Mock revenue timeseries data since we don't have historical months created
   const revenueData = [
