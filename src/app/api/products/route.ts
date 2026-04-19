@@ -4,14 +4,15 @@ import { prisma } from '@/lib/prisma';
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
-    const category = searchParams.get('category');
+    const collectionId = searchParams.get('collectionId');
     
     // Build query conditions
-    const whereCondition = category ? { category } : {};
+    const whereCondition = collectionId ? { collectionId } : {};
     
     const products = await prisma.product.findMany({
       where: whereCondition,
-      orderBy: { createdAt: 'desc' }
+      orderBy: { createdAt: 'desc' },
+      include: { collection: true }
     });
     
     // Parse the JSON strings back into arrays before sending to frontend
@@ -32,17 +33,20 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { title, description, price, compareAtPrice, images, colors, sizes, stock, category, isFeatured } = body;
+    const { title, description, price, compareAtPrice, images, colors, sizes, stock, collectionId, isFeatured } = body;
 
     // Basic validation
-    if (!title || !price || !images || !category) {
+    if (!title || !price || !images) {
       return new NextResponse("Missing required fields", { status: 400 });
     }
+
+    const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now();
 
     // Since we are using SQLite, we stringify the object arrays manually
     const product = await prisma.product.create({
       data: {
         title,
+        slug,
         description,
         price,
         compareAtPrice,
@@ -50,7 +54,7 @@ export async function POST(req: Request) {
         colors: JSON.stringify(colors || []),
         sizes: JSON.stringify(sizes || []),
         stock: stock || 10,
-        category,
+        collectionId: collectionId || null,
         isFeatured: isFeatured || false,
       }
     });

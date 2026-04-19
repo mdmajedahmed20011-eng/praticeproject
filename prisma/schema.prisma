@@ -4,34 +4,128 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+// -------------------------------------------------------------
+// CORE BUSINESS CONFIGURATION
+// -------------------------------------------------------------
+
+model SiteSetting {
+  id               String   @id @default("global") // Single instance
+  storeName        String   @default("LuxeAura")
+  contactEmail     String   @default("support@luxeaura.com")
+  currencySymbol   String   @default("Tk")
+  
+  // Homepage CMS Toggles
+  heroHeadline     String   @default("Elevate Your Style")
+  heroSubheadline  String   @default("Discover the 2026 Premium Collection")
+  heroImage        String   @default("https://images.unsplash.com/photo-1596755094514-f87e32f6b717?w=1200&q=80")
+  heroButtonText   String   @default("Shop Now")
+  heroButtonLink   String   @default("/collections")
+  
+  showFlashSale    Boolean  @default(true)
+  showBestSellers  Boolean  @default(true)
+  maintenanceMode  Boolean  @default(false)
+  updatedAt        DateTime @updatedAt
+}
+
+model AdminUser {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String   // Hashed password
+  name      String
+  role      String   @default("SUPERADMIN")
+  createdAt DateTime @default(now())
+}
+
+// -------------------------------------------------------------
+// E-COMMERCE MODELS
+// -------------------------------------------------------------
+
+model Collection {
+  id          String    @id @default(uuid())
+  name        String    @unique
+  slug        String    @unique
+  description String?
+  coverImage  String?
+  isActive    Boolean   @default(true)
+  products    Product[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 }
 
 model Product {
   id             String      @id @default(uuid())
   title          String
-  description    String
+  slug           String      @unique
+  description    String      // Rich text HTML supported here
   price          Float
   compareAtPrice Float?
-  images         String      // Will store stringified JSON array
-  colors         String?     // Will store stringified JSON array
-  sizes          String?     // Will store stringified JSON array
+  images         String      // Stringified JSON array of URLs
+  colors         String?     // Stringified JSON array of hex codes
+  sizes          String?     // Stringified JSON array of sizes
   stock          Int         @default(10)
-  category       String
   isFeatured     Boolean     @default(false)
+  isDraft        Boolean     @default(false)
+  
+  collection     Collection? @relation(fields: [collectionId], references: [id])
+  collectionId   String?
+
   createdAt      DateTime    @default(now())
   updatedAt      DateTime    @updatedAt
   orderItems     OrderItem[]
 }
 
+model Discount {
+  id         String   @id @default(uuid())
+  code       String   @unique // e.g. EID500
+  type       String   // "PERCENTAGE" or "FLAT"
+  value      Float
+  minOrderVal Float?  // Minimum order amount to qualify
+  maxUses    Int?     // Max total uses allowed
+  usedCount  Int      @default(0)
+  expiresAt  DateTime?
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+}
+
+// -------------------------------------------------------------
+// ORDER AND CUSTOMER CRM
+// -------------------------------------------------------------
+
+model Customer {
+  id          String   @id @default(uuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  address     String?
+  totalSpent  Float    @default(0)
+  orders      Order[]
+  createdAt   DateTime @default(now())
+}
+
 model Order {
   id              String      @id @default(uuid())
-  customerName    String
-  customerEmail   String
-  customerPhone   String
+  customer        Customer?   @relation(fields: [customerId], references: [id])
+  customerId      String?
+  
+  // Snapshots for orders made by guests not in CRM
+  guestName       String?
+  guestEmail      String?
+  guestPhone      String?
   shippingAddress String
+  
+  subtotal        Float
+  discountAmount  Float       @default(0)
   totalAmount     Float
+  
   paymentMethod   String      @default("COD")
-  status          String      @default("PENDING")
+  status          String      @default("PENDING") // PENDING, PROCESSING, SHIPPED, DELIVERED, CANCELLED
+  trackingId      String?
+  
+  adminNotes      String?
+  
   createdAt       DateTime    @default(now())
   updatedAt       DateTime    @updatedAt
   items           OrderItem[]
@@ -44,7 +138,7 @@ model OrderItem {
   quantity  Int
   size      String?
   color     String?
-  price     Float
+  price     Float   // Snapshot of the price at the time of purchase
 
   order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
   product Product @relation(fields: [productId], references: [id])

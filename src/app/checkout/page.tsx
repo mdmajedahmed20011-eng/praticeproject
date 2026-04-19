@@ -1,21 +1,51 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check } from 'lucide-react';
 import { useCart } from '@/context/CartContext';
 import styles from './page.module.css';
 
 export default function CheckoutPage() {
-  const { items, cartTotal } = useCart();
+  const { items, cartTotal, clearCart } = useCart();
+  const router = useRouter();
+  
   const [currentStep, setCurrentStep] = useState<number>(1);
   const [paymentMethod, setPaymentMethod] = useState<string>('cod');
 
-  const shippingCost = cartTotal > 5000 ? 0 : 100;
-  const grandTotal = cartTotal + shippingCost;
+  // Address & Contact State
+  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [address, setAddress] = useState('');
+  const [city, setCity] = useState('');
+  const [zip, setZip] = useState('');
 
-  if (items.length === 0) {
+  // Discount State
+  const [discountCode, setDiscountCode] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<any>(null);
+  const [discountError, setDiscountError] = useState('');
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const shippingCost = cartTotal > 5000 ? 0 : 100;
+  
+  // Calculate discount amount
+  let discountAmount = 0;
+  if (appliedDiscount) {
+    if (appliedDiscount.type === 'PERCENTAGE') {
+      discountAmount = (cartTotal * appliedDiscount.value) / 100;
+    } else if (appliedDiscount.type === 'FLAT') {
+      discountAmount = appliedDiscount.value;
+    }
+  }
+
+  const grandTotal = cartTotal + shippingCost - discountAmount;
+
+  if (items.length === 0 && !isSubmitting) {
     return (
       <div className={styles.checkoutPage} style={{ display: 'block', textAlign: 'center', paddingTop: '100px' }}>
         <h2>Your cart is currently empty.</h2>
@@ -30,6 +60,78 @@ export default function CheckoutPage() {
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     setCurrentStep(prev => prev + 1);
+  };
+
+  const applyDiscount = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDiscountError('');
+    if (!discountCode.trim()) return;
+
+    try {
+      const res = await fetch('/api/discounts');
+      const discounts = await res.json();
+      
+      const found = discounts.find((d: any) => d.code === discountCode.toUpperCase() && d.isActive);
+      
+      if (!found) {
+        setDiscountError('Invalid or expired discount code');
+        return;
+      }
+
+      if (found.minOrderVal && cartTotal < found.minOrderVal) {
+        setDiscountError(`Minimum order value Tk ${found.minOrderVal} required`);
+        return;
+      }
+
+      if (found.maxUses && found.usedCount >= found.maxUses) {
+        setDiscountError('Discount code usage limit reached');
+        return;
+      }
+
+      setAppliedDiscount(found);
+    } catch (err) {
+      console.error(err);
+      setDiscountError('Error applying discount');
+    }
+  };
+
+  const handlePlaceOrder = async () => {
+    setIsSubmitting(true);
+    try {
+      const orderPayload = {
+        customerName: `${firstName} ${lastName}`.trim(),
+        customerEmail: email,
+        customerPhone: phone,
+        shippingAddress: `${address}, ${city}, ${zip}`,
+        totalAmount: grandTotal,
+        paymentMethod: paymentMethod === 'cod' ? 'COD' : 'ONLINE',
+        items: items.map(i => ({
+          id: i.id,
+          quantity: i.quantity,
+          price: i.price,
+          selectedSize: i.size,
+          selectedColor: i.color
+        })),
+        discountCode: appliedDiscount?.code,
+        discountAmount: discountAmount
+      };
+
+      const res = await fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(orderPayload)
+      });
+
+      if (!res.ok) throw new Error('Failed to place order');
+
+      clearCart();
+      alert('Order placed successfully! Redirecting...');
+      router.push('/');
+    } catch (error) {
+      console.error(error);
+      alert('There was an error placing your order. Please try again.');
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -55,14 +157,20 @@ export default function CheckoutPage() {
                 exit={{ height: 0, opacity: 0 }}
               >
                 <div className={styles.inputGroup}>
-                  <input type="email" id="email" placeholder=" " required />
+                  <input type="email" id="email" placeholder=" " value={email} onChange={e => setEmail(e.target.value)} required />
                   <label htmlFor="email">Email Address</label>
                 </div>
                 <div className={styles.inputGroup}>
-                  <input type="tel" id="phone" placeholder=" " required />
+                  <input type="tel" id="phone" placeholder=" " value={phone} onChange={e => setPhone(e.target.value)} required />
                   <label htmlFor="phone">Phone Number</label>
                 </div>
-                <button className={styles.nextBtn} onClick={handleNext}>Continue to Shipping</button>
+                <button 
+                  className={styles.nextBtn} 
+                  onClick={handleNext} 
+                  disabled={!email || !phone}
+                >
+                  Continue to Shipping
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -86,29 +194,35 @@ export default function CheckoutPage() {
               >
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <input type="text" id="fn" placeholder=" " required />
+                    <input type="text" id="fn" placeholder=" " value={firstName} onChange={e => setFirstName(e.target.value)} required />
                     <label htmlFor="fn">First Name</label>
                   </div>
                   <div className={styles.inputGroup}>
-                    <input type="text" id="ln" placeholder=" " required />
+                    <input type="text" id="ln" placeholder=" " value={lastName} onChange={e => setLastName(e.target.value)} required />
                     <label htmlFor="ln">Last Name</label>
                   </div>
                 </div>
                 <div className={styles.inputGroup}>
-                  <input type="text" id="address" placeholder=" " required />
+                  <input type="text" id="address" placeholder=" " value={address} onChange={e => setAddress(e.target.value)} required />
                   <label htmlFor="address">Street Address</label>
                 </div>
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <input type="text" id="city" placeholder=" " required />
+                    <input type="text" id="city" placeholder=" " value={city} onChange={e => setCity(e.target.value)} required />
                     <label htmlFor="city">City / District</label>
                   </div>
                   <div className={styles.inputGroup}>
-                    <input type="text" id="zip" placeholder=" " required />
+                    <input type="text" id="zip" placeholder=" " value={zip} onChange={e => setZip(e.target.value)} required />
                     <label htmlFor="zip">Postal Code</label>
                   </div>
                 </div>
-                <button className={styles.nextBtn} onClick={handleNext}>Continue to Payment</button>
+                <button 
+                  className={styles.nextBtn} 
+                  onClick={handleNext}
+                  disabled={!firstName || !lastName || !address || !city}
+                >
+                  Continue to Payment
+                </button>
               </motion.div>
             )}
           </AnimatePresence>
@@ -153,8 +267,13 @@ export default function CheckoutPage() {
                     <span>Credit / Debit Card</span>
                   </div>
                 </div>
-                <button className={styles.submitBtn} style={{ marginTop: '20px' }}>
-                  Pay Now
+                <button 
+                  className={styles.submitBtn} 
+                  style={{ marginTop: '20px' }} 
+                  onClick={handlePlaceOrder}
+                  disabled={isSubmitting}
+                >
+                  {isSubmitting ? 'Processing...' : 'Place Order Now'}
                 </button>
               </motion.div>
             )}
@@ -184,18 +303,40 @@ export default function CheckoutPage() {
           ))}
         </div>
 
-        <div className={styles.totals}>
+        {/* Discount Code Input */}
+        <form onSubmit={applyDiscount} className={styles.discountForm} style={{ display: 'flex', gap: '10px', marginTop: '20px', paddingBottom: '20px', borderBottom: '1px solid #e5e5e5' }}>
+          <input 
+            type="text" 
+            placeholder="Discount code" 
+            value={discountCode}
+            onChange={e => setDiscountCode(e.target.value)}
+            style={{ flex: 1, padding: '12px', border: '1px solid #ddd', borderRadius: '4px', textTransform: 'uppercase' }}
+          />
+          <button type="submit" style={{ padding: '0 20px', background: discountCode ? '#111' : '#ccc', color: '#fff', border: 'none', borderRadius: '4px', cursor: discountCode ? 'pointer' : 'default' }}>
+            Apply
+          </button>
+        </form>
+        {discountError && <p style={{ color: '#e11d48', fontSize: '0.85rem', marginTop: '5px' }}>{discountError}</p>}
+        {appliedDiscount && <p style={{ color: '#10b981', fontSize: '0.85rem', marginTop: '5px' }}>Code applied: {appliedDiscount.code}</p>}
+
+        <div className={styles.totals} style={{ marginTop: '20px' }}>
           <div className={styles.totalRow}>
             <span>Subtotal</span>
             <span>Tk {cartTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
           </div>
+          {appliedDiscount && (
+            <div className={styles.totalRow} style={{ color: '#10b981' }}>
+              <span>Discount ({appliedDiscount.code})</span>
+              <span>- Tk {discountAmount.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            </div>
+          )}
           <div className={styles.totalRow}>
             <span>Shipping</span>
             <span>{shippingCost === 0 ? 'FREE' : `Tk ${shippingCost.toLocaleString('en-IN', { minimumFractionDigits: 2 })}`}</span>
           </div>
           <div className={`${styles.totalRow} ${styles.grandTotal}`}>
             <span>Total</span>
-            <span>Tk {grandTotal.toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
+            <span>Tk {Math.max(0, grandTotal).toLocaleString('en-IN', { minimumFractionDigits: 2 })}</span>
           </div>
         </div>
       </div>

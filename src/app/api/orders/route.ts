@@ -25,16 +25,21 @@ export async function POST(req: Request) {
     if (!items || !items.length) {
       return new NextResponse("No order items", { status: 400 });
     }
+    const subtotal = items.reduce((acc: number, item: any) => acc + (item.price * item.quantity), 0);
+    const discountAmount = Number(body.discountAmount) || 0;
+    const finalTotal = Number(totalAmount) || Math.max(0, subtotal - discountAmount); // Simplified. Shipping isn't handled here precisely but backend accepts totalAmount from body or calcs it.
 
     const order = await prisma.order.create({
       data: {
-        customerName,
-        customerEmail,
-        customerPhone,
-        shippingAddress,
-        totalAmount,
+        guestName: body.customerName || "Guest",
+        guestEmail: body.customerEmail || "guest@example.com",
+        guestPhone: body.customerPhone || "",
+        shippingAddress: body.shippingAddress || "",
+        subtotal: subtotal,
+        discountAmount: discountAmount,
+        totalAmount: finalTotal,
         status: "PENDING",
-        paymentMethod: "COD",
+        paymentMethod: body.paymentMethod || "COD",
         items: {
           create: items.map((item: any) => ({
             productId: item.id,

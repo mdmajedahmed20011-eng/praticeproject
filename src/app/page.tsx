@@ -3,14 +3,32 @@ import Categories from '@/components/Home/Categories';
 import PromoBanners from '@/components/Home/PromoBanners';
 import NewArrivals from '@/components/Home/NewArrivals';
 import Newsletter from '@/components/Home/Newsletter';
+import { prisma } from '@/lib/prisma';
 
-export default function Home() {
+export default async function Home() {
+  const settings = await prisma.siteSetting.findUnique({ where: { id: "global" } }) || {
+    heroHeadline: "Elevate Your Style",
+    heroSubheadline: "Discover the 2026 Premium Collection",
+    heroImage: "https://images.unsplash.com/photo-1596755094514-f87e32f6b717?w=1200",
+    heroButtonText: "Shop Now",
+    heroButtonLink: "/collections",
+    showFlashSale: true,
+    showBestSellers: true,
+    maintenanceMode: false
+  };
+
+  if (settings.maintenanceMode) {
+    return <div style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <h1>We are currently down for maintenance. Check back shortly.</h1>
+    </div>;
+  }
+
   return (
     <main>
-      <Hero />
+      <Hero settings={settings} />
       <Categories />
-      <PromoBanners />
-      <NewArrivals />
+      {settings.showFlashSale && <PromoBanners />}
+      {settings.showBestSellers && <NewArrivals />}
       <Newsletter />
     </main>
   );

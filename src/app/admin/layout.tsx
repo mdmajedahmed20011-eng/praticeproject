@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Package, ShoppingCart, LayoutDashboard, Settings, LogOut } from 'lucide-react';
+import { LayoutDashboard, ShoppingBag, ShoppingCart, Users, Home, Settings, Package, LogOut } from 'lucide-react';
 import styles from './layout.module.css';
 
 export const metadata = {
@@ -25,9 +25,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
             <Package size={20} />
             Products
           </Link>
+          <Link href="/admin/collections" className={styles.navLink}>
+            <ShoppingBag size={20} />
+            Collections
+          </Link>
           <Link href="/admin/orders" className={styles.navLink}>
             <ShoppingCart size={20} />
             Orders
+          </Link>
+          <Link href="/admin/discounts" className={styles.navLink}>
+            <LayoutDashboard size={20} />
+            Discounts
           </Link>
           <Link href="/admin/settings" className={styles.navLink}>
             <Settings size={20} />
