@@ -1,9 +1,12 @@
 import { prisma } from '@/lib/prisma';
+import { connection } from 'next/server';
 import styles from './page.module.css';
 import { DollarSign, ShoppingBag, Package, AlertCircle } from 'lucide-react';
 import DashboardCharts from './DashboardCharts';
 
 export default async function AdminDashboard() {
+  await connection();
+
   const [totalOrders, totalProducts, lowStockProducts, recentOrders] = await Promise.all([
     prisma.order.count(),
     prisma.product.count(),
@@ -16,7 +19,7 @@ export default async function AdminDashboard() {
   ]);
 
   const allOrders = await prisma.order.findMany({ select: { totalAmount: true }});
-  const totalRevenue = allOrders.reduce((acc, order) => acc + order.totalAmount, 0);
+  const totalRevenue = allOrders.reduce((acc: number, order: { totalAmount: number }) => acc + order.totalAmount, 0);
 
   // Mock revenue timeseries data since we don't have historical months created
   const revenueData = [
@@ -97,7 +100,7 @@ export default async function AdminDashboard() {
             </tr>
           </thead>
           <tbody>
-            {recentOrders.map(order => (
+            {recentOrders.map((order: any) => (
               <tr key={order.id}>
                 <td>#{order.id.slice(0, 8)}</td>
                 <td>{order.customer?.name || order.guestName || "Guest"}</td>

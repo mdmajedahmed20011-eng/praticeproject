@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
     const collectionId = searchParams.get('collectionId');
+    type ProductWithCollection = Prisma.ProductGetPayload<{ include: { collection: true } }>;
     
     // Build query conditions
     const whereCondition = collectionId ? { collectionId } : {};
     
-    const products = await prisma.product.findMany({
+    const products: ProductWithCollection[] = await prisma.product.findMany({
       where: whereCondition,
       orderBy: { createdAt: 'desc' },
       include: { collection: true }

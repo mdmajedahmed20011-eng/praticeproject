@@ -3,9 +3,12 @@ import Categories from '@/components/Home/Categories';
 import PromoBanners from '@/components/Home/PromoBanners';
 import NewArrivals from '@/components/Home/NewArrivals';
 import Newsletter from '@/components/Home/Newsletter';
+import { connection } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 export default async function Home() {
+  await connection();
+
   const settings = await prisma.siteSetting.findUnique({ where: { id: "global" } }) || {
     heroHeadline: "Elevate Your Style",
     heroSubheadline: "Discover the 2026 Premium Collection",
