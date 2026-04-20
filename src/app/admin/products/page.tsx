@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Search, Edit, Trash2, Filter, ChevronDown, CheckSquare, Square } from 'lucide-react';
 import styles from './page.module.css';
@@ -22,7 +22,7 @@ interface Collection {
   name: string;
 }
 
-export default function AdminProductsPage() {
+function AdminProductsContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   
@@ -182,7 +182,7 @@ export default function AdminProductsPage() {
           <table className={styles.table}>
             <thead>
               <tr>
-                <th width="40" onClick={toggleSelectAll} style={{ cursor: 'pointer' }}>
+                <th style={{ width: '40px', cursor: 'pointer' }} onClick={toggleSelectAll}>
                   {selectedIds.length === products.length && products.length > 0 
                     ? <CheckSquare size={18} color="#0ea5e9" /> 
                     : <Square size={18} color="#cbd5e1" />}
@@ -271,6 +271,14 @@ export default function AdminProductsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function AdminProductsPage() {
+  return (
+    <Suspense fallback={<div>Loading dashboard...</div>}>
+      <AdminProductsContent />
+    </Suspense>
   );
 }
 

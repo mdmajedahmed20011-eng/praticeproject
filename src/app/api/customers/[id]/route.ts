@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const customer = await prisma.customer.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         orders: {
           orderBy: { createdAt: 'desc' },
@@ -24,7 +25,14 @@ export async function GET(
       return NextResponse.json({ error: 'Customer not found' }, { status: 404 });
     }
 
-    return NextResponse.json(customer);
+    // Add stats
+    const stats = {
+      totalSpent: customer.orders.reduce((acc, order) => acc + order.totalAmount, 0),
+      orderCount: customer.orders.length,
+      lastOrderDate: customer.orders[0]?.createdAt || null
+    };
+
+    return NextResponse.json({ ...customer, stats });
   } catch (error) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
@@ -32,12 +40,13 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const updated = await prisma.customer.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         email: body.email,

@@ -3,15 +3,16 @@ import { prisma } from '@/lib/prisma';
 import ProductClient from './ProductClient';
 
 interface ProductPageProps {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 // ── Dynamic Metadata API ──
 export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+  const { id } = await params;
   // We try to fetch from DB, fallback to mock logic if needed for safety
   try {
     const product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { collection: true }
     });
 
@@ -22,13 +23,15 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
       };
     }
 
+    const images = product.images ? JSON.parse(product.images) : [];
+
     return {
       title: `${product.title} - ${product.collection?.name || 'LuxeAura Premium'}`,
       description: product.description.substring(0, 160).replace(/<[^>]*>/g, ''),
       openGraph: {
         title: product.title,
         description: product.description.substring(0, 160).replace(/<[^>]*>/g, ''),
-        images: [JSON.parse(product.images)[0]],
+        images: images.length > 0 ? [images[0]] : [],
         type: 'article',
       },
     };
@@ -42,11 +45,12 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
+  const { id } = await params;
   let product: any = null;
 
   try {
     product = await prisma.product.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { collection: true }
     });
 
@@ -63,13 +67,52 @@ export default async function ProductPage({ params }: ProductPageProps) {
     console.error('[PRODUCT_FETCH_ERROR]', e);
   }
 
-  // If no product found, show error instead of fake mock data
+  // If no product found, show luxury error instead of fake mock data
   if (!product) {
     return (
-      <div style={{ padding: '100px 20px', textAlign: 'center', backgroundColor: '#fff', height: '60vh' }}>
-        <h1 style={{ fontFamily: 'Inter', fontSize: '2rem', marginBottom: '1rem' }}>Product Not Found</h1>
-        <p style={{ color: '#666' }}>The luxury item you are looking for is currently unavailable or has been removed.</p>
-        <a href="/" style={{ display: 'inline-block', marginTop: '20px', padding: '10px 25px', backgroundColor: '#000', color: '#fff', textDecoration: 'none' }}>Back to Home</a>
+      <div className="luxury-error-state" style={{ 
+        padding: '120px 20px', 
+        textAlign: 'center', 
+        backgroundColor: '#fff', 
+        minHeight: '70vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <h1 style={{ 
+          fontFamily: 'var(--font-playfair)', 
+          fontSize: '3rem', 
+          fontWeight: 300,
+          marginBottom: '1.5rem',
+          letterSpacing: '0.05em',
+          textTransform: 'uppercase'
+        }}>
+          Vanished into <br/> Elegance
+        </h1>
+        <p style={{ 
+          color: '#888', 
+          maxWidth: '400px', 
+          lineHeight: '1.8',
+          fontSize: '1rem',
+          letterSpacing: '0.01em',
+          marginBottom: '2.5rem'
+        }}>
+          The luxury item you seek is no longer in our current curation. 
+          Discover our latest acquisitions instead.
+        </p>
+        <a href="/collections" style={{ 
+          display: 'inline-block', 
+          padding: '15px 40px', 
+          backgroundColor: '#000', 
+          color: '#fff', 
+          textDecoration: 'none',
+          fontSize: '0.8rem',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase'
+        }}>
+          Explore Collections
+        </a>
       </div>
     );
   }

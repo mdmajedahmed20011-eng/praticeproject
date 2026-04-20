@@ -45,7 +45,8 @@ export default async function Home() {
       })
     ]);
 
-    const parseJsonSafely = (str: string, fallback: any = []) => {
+    const parseJsonSafely = (str: string | null, fallback: any = []) => {
+      if (!str) return fallback;
       try {
         const parsed = JSON.parse(str);
         return Array.isArray(parsed) ? parsed : [parsed];
