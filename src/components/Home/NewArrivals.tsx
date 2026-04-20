@@ -1,66 +1,137 @@
 'use client';
 
 import { motion } from 'framer-motion';
+import { Heart, Star, ShoppingBag } from 'lucide-react';
+import Link from 'next/link';
+import Image from 'next/image';
+import { useCart, CartItem } from '@/context/CartContext';
 import styles from './NewArrivals.module.css';
 
-const products = [
-  { id: 1, name: 'Silk Embroidered Saree', price: '৳ 25,000', image: 'https://images.unsplash.com/photo-1583391733958-69213190fc53?auto=format&fit=crop&q=80&w=600' },
-  { id: 2, name: 'Luxury Velvet Sherwani', price: '৳ 45,000', image: 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=600' },
-  { id: 3, name: 'Handcrafted Kurti Set', price: '৳ 12,500', image: 'https://images.unsplash.com/photo-1585487000160-6ebcfceb0d03?auto=format&fit=crop&q=80&w=600' },
-  { id: 4, name: 'Classic Leather Loafers', price: '৳ 8,000', image: 'https://images.unsplash.com/photo-1616406432452-07bc5938759d?auto=format&fit=crop&q=80&w=600' },
-];
+export default function NewArrivals({ products }: { products: any[] }) {
+  const { addToCart } = useCart();
 
-export default function NewArrivals() {
+  const handleAddToCart = (e: React.MouseEvent, product: any) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const cartItem: CartItem = {
+      id: `${product.id}-${product.sizes?.[0]}-${product.colors?.[0]}`,
+      productId: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+      size: product.sizes?.[0] || 'Standard',
+      color: product.colors?.[0] || 'Original',
+      quantity: 1
+    };
+
+    addToCart(cartItem);
+  };
+
+  if (!products || products.length === 0) return null;
+
   return (
-    <section className={styles.newArrivals}>
-      <motion.h2 
-        className={styles.title}
+    <section className={styles.section}>
+      <motion.div
+        className={styles.header}
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
       >
-        New Arrivals
-      </motion.h2>
+        <span className={styles.label}>FRESH DROPS</span>
+        <h2 className={styles.sectionTitle}>New Arrivals</h2>
+      </motion.div>
 
-      <motion.div 
+      <motion.div
         className={styles.productGrid}
         initial="hidden"
         whileInView="visible"
         viewport={{ once: true, margin: "-50px" }}
-        variants={{
-          visible: { transition: { staggerChildren: 0.1 } }
-        }}
+        variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
       >
         {products.map((product) => (
-          <motion.div 
-            key={product.id} 
+          <motion.div
+            key={product.id}
             className={styles.productCard}
             variants={{
-              hidden: { opacity: 0, y: 20 },
+              hidden: { opacity: 0, y: 30 },
               visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
             }}
           >
-            <div className={styles.imageContainer}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={product.image} alt={product.name} className={styles.productImage} />
-              <div className={styles.quickAdd}>Quick Add</div>
-            </div>
-            <div className={styles.productInfo}>
-              <h3>{product.name}</h3>
-              <p className={styles.productPrice}>{product.price}</p>
-            </div>
+            <Link href={`/product/${product.id}`} className={styles.linkContainer}>
+              <div className={styles.imageContainer} style={{ position: 'relative' }}>
+                <Image 
+                  src={product.image} 
+                  alt={product.title} 
+                  fill 
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className={styles.productImage} 
+                  style={{ objectFit: 'cover' }}
+                />
+
+                {product.compareAtPrice && product.price < product.compareAtPrice && (
+                  <span className={`${styles.badge} ${styles.badgeSale}`}>SALE</span>
+                )}
+
+                <button className={styles.wishlistBtn} aria-label="Add to wishlist" onClick={(e) => e.preventDefault()}>
+                  <Heart size={18} strokeWidth={1.5} />
+                </button>
+
+                <div className={styles.addToCartOverlay}>
+                  <button 
+                    className={styles.addToCartBtn}
+                    onClick={(e) => handleAddToCart(e, product)}
+                  >
+                    <ShoppingBag size={16} /> Add to Cart
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.productInfo}>
+                <div className={styles.ratingRow}>
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      size={11}
+                      fill={i < 4 ? '#C9A96E' : 'none'}
+                      stroke={i < 4 ? '#C9A96E' : '#ddd'}
+                    />
+                  ))}
+                  <span className={styles.ratingText}>(4.8)</span>
+                </div>
+
+                <h3 className={styles.productName}>{product.title}</h3>
+
+                {product.colors && product.colors.length > 0 && (
+                  <div className={styles.colorSwatches}>
+                    {product.colors.map((color: string, i: number) => (
+                      <span key={i} className={styles.swatch} style={{ background: color }} />
+                    ))}
+                  </div>
+                )}
+
+                <div className={styles.priceRow}>
+                  <span className={styles.price}>৳ {product.price.toLocaleString()}</span>
+                  {product.compareAtPrice && (
+                    <span className={styles.comparePrice}>৳ {product.compareAtPrice.toLocaleString()}</span>
+                  )}
+                </div>
+              </div>
+            </Link>
           </motion.div>
         ))}
       </motion.div>
 
-      <motion.button 
-        className={styles.viewAllButton}
+      <motion.div
+        className={styles.viewAllWrapper}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true }}
       >
-        View All Products
-      </motion.button>
+        <Link href="/collections" className={styles.viewAllButton}>
+          View All Products
+        </Link>
+      </motion.div>
     </section>
   );
 }

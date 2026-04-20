@@ -1,0 +1,135 @@
+.section {
+  padding: 100px 40px;
+  background: var(--cream);
+  overflow: hidden;
+}
+
+.container {
+  display: flex;
+  gap: 80px;
+  align-items: center;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+.imageCol {
+  flex: 1;
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  aspect-ratio: 4/5;
+  object-fit: cover;
+  position: relative;
+  z-index: 2;
+}
+
+.imageAccent {
+  position: absolute;
+  top: 20px;
+  left: -20px;
+  width: 100%;
+  height: 100%;
+  border: 2px solid var(--gold);
+  z-index: 1;
+}
+
+.textCol {
+  flex: 1;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-heading);
+  font-size: 2.6rem;
+  font-weight: 400;
+  color: var(--foreground);
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.description {
+  font-size: 0.95rem;
+  color: var(--foreground-muted);
+  line-height: 1.8;
+  margin-bottom: 16px;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin: 40px 0;
+  padding-top: 32px;
+  border-top: 1px solid var(--ash);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+}
+
+.statNumber {
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  font-weight: 500;
+  color: var(--foreground);
+  margin-bottom: 4px;
+}
+
+.statLabel {
+  font-size: 0.75rem;
+  color: var(--foreground-light);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ctaButton {
+  display: inline-block;
+  padding: 14px 36px;
+  background: var(--foreground);
+  color: var(--background);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  transition: all var(--duration-normal) ease;
+}
+
+.ctaButton:hover {
+  background: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+    gap: 48px;
+  }
+  .section {
+    padding: 80px 24px;
+  }
+  .imageAccent {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 2rem;
+  }
+  .section {
+    padding: 60px 16px;
+  }
+}

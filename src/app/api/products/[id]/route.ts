@@ -8,7 +8,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     const { id } = await params;
     const product = await prisma.product.findUnique({
       where: { id },
-      include: { collection: true }
+      include: { 
+        collection: true,
+        variants: true
+      }
     });
     
     if (!product) {
@@ -37,31 +40,70 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     const { id } = await params;
     const data = await req.json();
-    const { title, slug, description, price, compareAtPrice, images, colors, sizes, stock, isFeatured, isDraft, collectionId } = data;
+    
+    const { 
+      title, slug, sku, description, price, compareAtPrice, 
+      images, colors, sizes, stock, isFeatured, isDraft, collectionId,
+      metaTitle, metaDescription, tags, weight, dimensions, 
+      displayOrder, variants 
+    } = data;
 
-    const product = await prisma.product.update({
-      where: { id },
-      data: {
-        title,
-        slug,
-        description,
-        price,
-        compareAtPrice,
-        images: JSON.stringify(images),
-        colors: JSON.stringify(colors || []),
-        sizes: JSON.stringify(sizes || []),
-        stock,
-        isFeatured,
-        isDraft,
-        collectionId,
-      },
+    // Use transaction to update product and its variants
+    const result = await prisma.$transaction(async (tx) => {
+      const updatedProduct = await tx.product.update({
+        where: { id },
+        data: {
+          title,
+          slug,
+          sku: sku || null,
+          description,
+          price,
+          compareAtPrice,
+          images: JSON.stringify(images),
+          colors: JSON.stringify(colors || []),
+          sizes: JSON.stringify(sizes || []),
+          stock,
+          isFeatured,
+          isDraft,
+          collectionId,
+          metaTitle,
+          metaDescription,
+          tags,
+          weight: weight ? Number(weight) : null,
+          dimensions,
+          displayOrder: Number(displayOrder || 0),
+        },
+      });
+
+      // Handle Variants if provided
+      if (variants && Array.isArray(variants)) {
+        // Delete old variants and recreat (simpler for this version, or update existing)
+        await tx.productVariant.deleteMany({ where: { productId: id } });
+        
+        if (variants.length > 0) {
+          await tx.productVariant.createMany({
+            data: variants.map((v: any) => ({
+              productId: id,
+              size: v.size,
+              color: v.color,
+              sku: v.sku || null,
+              price: v.price ? Number(v.price) : null,
+              stock: Number(v.stock || 0)
+            }))
+          });
+        }
+      }
+
+      return updatedProduct;
     });
 
-    return NextResponse.json(product);
+    return NextResponse.json(result);
   } catch (error: any) {
     console.error('Error updating product:', error);
     if (error.code === 'P2002') {
-      return NextResponse.json({ error: 'Product slug already exists' }, { status: 400 });
+      const target = error.meta?.target || '';
+      if (target.includes('slug')) return NextResponse.json({ error: 'Product slug already exists' }, { status: 400 });
+      if (target.includes('sku')) return NextResponse.json({ error: 'SKU already exists' }, { status: 400 });
     }
     return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
   }
@@ -85,3 +127,4 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 });
   }
 }
+

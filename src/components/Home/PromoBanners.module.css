@@ -1,10 +1,132 @@
-.promoSection {
-  display: flex;
-  width: 100%;
-  gap: 15px;
+.section {
+  padding: 0 40px 80px 40px;
+  background: var(--background);
+}
+
+.container {
   max-width: var(--page-max-width);
   margin: 0 auto;
-  padding: 0 20px 80px 20px;
+}
+
+/* ── Flash Sale Banner ── */
+.flashBanner {
+  display: flex;
+  overflow: hidden;
+  background: var(--charcoal);
+  margin-bottom: 16px;
+}
+
+.flashContent {
+  flex: 1;
+  padding: 60px 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  color: #fff;
+}
+
+.flashLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 700;
+  margin-bottom: 16px;
+}
+
+.flashTitle {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  font-weight: 500;
+  margin-bottom: 8px;
+  line-height: 1.1;
+}
+
+.flashSub {
+  font-size: 0.95rem;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 32px;
+}
+
+/* ── Countdown ── */
+.countdown {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 36px;
+}
+
+.countdownUnit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.countdownNumber {
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
+  font-weight: 500;
+  color: #fff;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 8px 16px;
+  min-width: 64px;
+  text-align: center;
+  border-radius: var(--radius-sm);
+}
+
+.countdownLabel {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-top: 6px;
+}
+
+.countdownSep {
+  font-size: 1.8rem;
+  color: var(--gold);
+  font-weight: 300;
+  padding-bottom: 20px;
+}
+
+.flashBtn {
+  display: inline-block;
+  padding: 14px 36px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all var(--duration-normal) ease;
+  align-self: flex-start;
+}
+
+.flashBtn:hover {
+  background: var(--gold-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-gold);
+}
+
+.flashImage {
+  flex: 0 0 40%;
+  overflow: hidden;
+}
+
+.flashImage img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Promo Row ── */
+.promoRow {
+  display: flex;
+  gap: 16px;
 }
 
 .promoCard {
@@ -12,8 +134,8 @@
   position: relative;
   aspect-ratio: 16/9;
   overflow: hidden;
-  cursor: pointer;
-  background-color: var(--secondary);
+  display: block;
+  text-decoration: none;
 }
 
 .promoImage {
@@ -24,56 +146,77 @@
 }
 
 .promoCard:hover .promoImage {
-  transform: scale(1.03);
+  transform: scale(1.05);
 }
 
 .promoOverlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,0.2);
+  background: linear-gradient(transparent 40%, rgba(0,0,0,0.6) 100%);
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  justify-content: flex-end;
+  padding: 32px;
   color: #fff;
-  transition: background 0.3s ease;
+  transition: background var(--duration-normal) ease;
 }
 
 .promoCard:hover .promoOverlay {
-  background: rgba(0,0,0,0.3);
+  background: linear-gradient(transparent 20%, rgba(0,0,0,0.7) 100%);
 }
 
 .promoTitle {
-  font-size: 2rem;
-  letter-spacing: 0.1em;
-  font-weight: 300;
-  text-transform: uppercase;
-  margin-bottom: 20px;
+  font-family: var(--font-heading);
+  font-size: 1.6rem;
+  font-weight: 400;
+  margin: 12px 0 8px;
 }
 
-.promoButton {
-  background: var(--accent);
-  color: #fff;
-  padding: 12px 30px;
-  font-size: 0.8rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
+.promoLink {
+  font-size: 0.75rem;
   font-weight: 600;
-  border: 1px solid var(--accent);
-  transition: all 0.3s ease;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  opacity: 0;
+  transform: translateY(8px);
+  transition: all var(--duration-normal) ease;
 }
 
-.promoButton:hover {
-  background: transparent;
-  color: var(--accent);
-  transform: translateY(-3px);
+.promoCard:hover .promoLink {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (max-width: 1024px) {
+  .flashBanner {
+    flex-direction: column;
+  }
+  .flashImage {
+    aspect-ratio: 16/9;
+    flex: none;
+  }
+  .section {
+    padding: 0 24px 60px 24px;
+  }
 }
 
 @media (max-width: 768px) {
-  .promoSection {
+  .promoRow {
     flex-direction: column;
   }
   .promoCard {
     aspect-ratio: 4/3;
+  }
+  .flashContent {
+    padding: 40px 24px;
+  }
+  .flashTitle {
+    font-size: 2rem;
+  }
+  .countdownNumber {
+    font-size: 1.5rem;
+    min-width: 48px;
+    padding: 6px 10px;
   }
 }

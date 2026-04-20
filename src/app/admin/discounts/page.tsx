@@ -117,83 +117,118 @@ export default function AdminDiscountsPage() {
     }
   };
 
+  const usagePercentage = (d: Discount) => {
+    if (!d.maxUses) return 0;
+    return Math.min(100, (d.usedCount / d.maxUses) * 100);
+  };
+
+  const isExpired = (date: string | null) => {
+    if (!date) return false;
+    return new Date(date) < new Date();
+  };
+
   return (
-    <div className={styles.container}>
+    <div className={styles.discountsWrapper}>
       <div className={styles.header}>
-        <div>
-          <h1>Discounts</h1>
-          <p>Create and manage discount codes for your customers.</p>
+        <div className={styles.titleArea}>
+          <h1>Promotions</h1>
+          <p>Drive sales with bespoke discount codes and automated campaigns.</p>
         </div>
         <button className={styles.createBtn} onClick={() => openModal()}>
           <Plus size={20} /> Create Discount
         </button>
       </div>
 
-      <div className={styles.tableContainer}>
-        {isLoading ? (
-          <p style={{ padding: '2rem', textAlign: 'center' }}>Loading discounts...</p>
-        ) : (
-          <table className={styles.table}>
-            <thead>
-              <tr>
-                <th>Code</th>
-                <th>Discount</th>
-                <th>Condition</th>
-                <th>Usage</th>
-                <th>Expires</th>
-                <th>Status</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {discounts.map(d => (
-                <tr key={d.id}>
-                  <td><span className={styles.codeBadge}>{d.code}</span></td>
-                  <td style={{ fontWeight: 600 }}>
-                    {d.type === 'PERCENTAGE' ? `${d.value}% OFF` : `Tk ${d.value} OFF`}
-                  </td>
-                  <td>
-                    {d.minOrderVal ? `Min Tk ${d.minOrderVal}` : 'None'}
-                  </td>
-                  <td>
-                    {d.usedCount} {d.maxUses ? `/ ${d.maxUses}` : 'uses'}
-                  </td>
-                  <td>
-                    {d.expiresAt ? new Date(d.expiresAt).toLocaleDateString() : 'Never'}
-                  </td>
-                  <td>
-                    <span className={styles.statusBadge} data-active={d.isActive}>
-                      {d.isActive ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className={styles.actions}>
-                      <button className={styles.iconBtn} onClick={() => openModal(d)}>
-                        <Edit size={16} />
-                      </button>
-                      <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(d.id)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-              {discounts.length === 0 && (
+      {/* ── KPI Cards ── */}
+      <div className={styles.metricsGrid}>
+        <div className={styles.metricCard}>
+          <span className={styles.metricLabel}>Active Coupons</span>
+          <span className={styles.metricValue}>{discounts.filter(d => d.isActive && !isExpired(d.expiresAt)).length}</span>
+        </div>
+        <div className={styles.metricCard}>
+          <span className={styles.metricLabel}>Total Redemptions</span>
+          <span className={styles.metricValue}>{discounts.reduce((acc, d) => acc + d.usedCount, 0)}</span>
+        </div>
+        <div className={styles.metricCard}>
+          <span className={styles.metricLabel}>Scheduled/Expired</span>
+          <span className={styles.metricValue}>{discounts.filter(d => isExpired(d.expiresAt)).length}</span>
+        </div>
+      </div>
+
+      <div className={styles.tableCard}>
+        <div className={styles.tableWrapper}>
+          {isLoading ? (
+            <div style={{ padding: '80px', textAlign: 'center', color: '#64748b' }}>Syncing Promotions...</div>
+          ) : (
+            <table className={styles.table}>
+              <thead>
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '2rem' }}>No discounts found.</td>
+                  <th>Campaign Code</th>
+                  <th>Benefit</th>
+                  <th>Restrictions</th>
+                  <th>Usage Tracking</th>
+                  <th>Expiration</th>
+                  <th>Status</th>
+                  <th>Actions</th>
                 </tr>
-              )}
-            </tbody>
-          </table>
-        )}
+              </thead>
+              <tbody>
+                {discounts.map(d => (
+                  <tr key={d.id}>
+                    <td><span className={styles.codeBadge}>{d.code}</span></td>
+                    <td style={{ fontWeight: 700 }}>
+                      {d.type === 'PERCENTAGE' ? `${d.value}% OFF` : `৳${d.value} OFF`}
+                    </td>
+                    <td style={{ fontSize: '0.85rem', color: '#64748b' }}>
+                      {d.minOrderVal ? `Min Order ৳${d.minOrderVal}` : 'No Minimum'}
+                    </td>
+                    <td>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                         <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{d.usedCount} / {d.maxUses || '∞'}</span>
+                         {d.maxUses && (
+                           <div className={styles.usageBarContainer}>
+                              <div className={styles.usageBar} style={{ width: `${usagePercentage(d)}%`, background: usagePercentage(d) > 90 ? '#ef4444' : '#0ea5e9' }} />
+                           </div>
+                         )}
+                      </div>
+                    </td>
+                    <td>
+                      {d.expiresAt ? new Date(d.expiresAt).toLocaleDateString() : 'Never'}
+                    </td>
+                    <td>
+                      <span className={`${styles.statusBadge} ${isExpired(d.expiresAt) ? styles.expired : d.isActive ? styles.active : styles.inactive}`}>
+                        {isExpired(d.expiresAt) ? 'Expired' : d.isActive ? 'Active' : 'Draft'}
+                      </span>
+                    </td>
+                    <td>
+                      <div className={styles.actions}>
+                        <button className={styles.iconBtn} onClick={() => openModal(d)}>
+                          <Edit size={16} />
+                        </button>
+                        <button className={`${styles.iconBtn} ${styles.dangerBtn}`} onClick={() => handleDelete(d.id)}>
+                          <Trash2 size={16} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+                {discounts.length === 0 && (
+                  <tr>
+                    <td colSpan={7} style={{ textAlign: 'center', padding: '60px', color: '#64748b' }}>No active campaigns. Create one to boost store momentum.</td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          )}
+        </div>
       </div>
 
       {isModalOpen && (
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h2>{editingDiscount ? 'Edit Discount' : 'Create Discount'}</h2>
-              <button className={styles.closeBtn} onClick={closeModal}><X size={24} /></button>
+            <div className={styles.modalHeader} style={{ marginBottom: '24px', display: 'flex', justifyContent: 'space-between' }}>
+              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{editingDiscount ? 'Campaign Settings' : 'New Campaign'}</h2>
+              <button onClick={closeModal} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.5rem', color: '#64748b' }}>&times;</button>
             </div>
 
             <form onSubmit={handleSubmit}>
@@ -201,20 +236,21 @@ export default function AdminDiscountsPage() {
                 <label>Discount Code</label>
                 <input 
                   type="text" 
+                  className={styles.input}
                   value={code} 
                   onChange={e => setCode(e.target.value)} 
-                  placeholder="e.g. SUMMER20" 
+                  placeholder="e.g. LUXE20" 
                   required 
-                  style={{ textTransform: 'uppercase' }}
+                  style={{ textTransform: 'uppercase', fontWeight: 700, letterSpacing: '0.05em' }}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className={styles.formGroup}>
                   <label>Type</label>
-                  <select value={type} onChange={e => setType(e.target.value)}>
+                  <select className={styles.input} value={type} onChange={e => setType(e.target.value)}>
                     <option value="PERCENTAGE">Percentage (%)</option>
-                    <option value="FLAT">Flat Amount (Tk)</option>
+                    <option value="FLAT">Flat Amount (৳)</option>
                   </select>
                 </div>
 
@@ -222,6 +258,7 @@ export default function AdminDiscountsPage() {
                   <label>Value</label>
                   <input 
                     type="number" 
+                    className={styles.input}
                     value={value} 
                     onChange={e => setValue(Number(e.target.value))} 
                     required 
@@ -231,50 +268,51 @@ export default function AdminDiscountsPage() {
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                 <div className={styles.formGroup}>
-                  <label>Minimum Order Value (Optional)</label>
+                  <label>Min Requirement (৳)</label>
                   <input 
                     type="number" 
+                    className={styles.input}
                     value={minOrderVal} 
                     onChange={e => setMinOrderVal(e.target.value ? Number(e.target.value) : '')} 
-                    min="0"
                   />
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Max Uses (Optional)</label>
+                  <label>Max Uses</label>
                   <input 
                     type="number" 
+                    className={styles.input}
                     value={maxUses} 
                     onChange={e => setMaxUses(e.target.value ? Number(e.target.value) : '')} 
-                    min="1"
                   />
                 </div>
               </div>
 
               <div className={styles.formGroup}>
-                <label>Expiration Date (Optional)</label>
+                <label>Expires On</label>
                 <input 
                   type="date" 
+                  className={styles.input}
                   value={expiresAt} 
                   onChange={e => setExpiresAt(e.target.value)} 
                 />
               </div>
 
-              <div className={styles.formGroup}>
-                <label className={styles.checkboxLabel}>
-                  <input 
-                    type="checkbox" 
-                    checked={isActive} 
-                    onChange={e => setIsActive(e.target.checked)} 
-                  />
-                  Active
-                </label>
+              <div className={styles.checkboxGroup} style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '12px' }}>
+                <input 
+                  type="checkbox" 
+                  id="isActive"
+                  checked={isActive} 
+                  onChange={e => setIsActive(e.target.checked)} 
+                  style={{ width: '18px', height: '18px' }}
+                />
+                <label htmlFor="isActive" style={{ fontSize: '0.9rem', fontWeight: 600 }}>Enable Campaign</label>
               </div>
 
               <button type="submit" className={styles.submitBtn}>
-                Save Discount
+                {editingDiscount ? 'Update Campaign' : 'Initialize Campaign'}
               </button>
             </form>
           </div>

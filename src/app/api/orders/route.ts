@@ -3,9 +3,29 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(req: Request) {
   try {
+    const { searchParams } = new URL(req.url);
+    const status = searchParams.get('status');
+    const search = searchParams.get('q');
+
+    const whereCondition: any = {};
+    if (status && status !== 'all') {
+      whereCondition.status = status;
+    }
+
+    if (search) {
+      whereCondition.OR = [
+        { id: { contains: search } },
+        { guestName: { contains: search } },
+        { guestEmail: { contains: search } },
+        { customer: { name: { contains: search } } }
+      ];
+    }
+
     const orders = await prisma.order.findMany({
+      where: whereCondition,
       include: {
-        items: true
+        items: true,
+        customer: true
       },
       orderBy: { createdAt: 'desc' }
     });

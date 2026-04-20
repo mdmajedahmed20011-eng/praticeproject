@@ -31,12 +31,14 @@ const CartContext = createContext<CartContextType | undefined>(undefined);
 export function CartProvider({ children }: { children: React.ReactNode }) {
   const [items, setItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
   // Simple local storage persistence
   useEffect(() => {
+    setHasMounted(true);
     const saved = localStorage.getItem('luxeaura_cart');
     if (saved) setItems(JSON.parse(saved));
   }, []);
@@ -77,7 +79,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   const cartTotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
 
   return (
-    <CartContext.Provider value={{ items, addToCart, removeFromCart, updateQuantity, clearCart, cartCount, cartTotal, isCartOpen, openCart, closeCart }}>
+    <CartContext.Provider value={{ items: hasMounted ? items : [], addToCart, removeFromCart, updateQuantity, clearCart, cartCount: hasMounted ? cartCount : 0, cartTotal: hasMounted ? cartTotal : 0, isCartOpen, openCart, closeCart }}>
       {children}
     </CartContext.Provider>
   );

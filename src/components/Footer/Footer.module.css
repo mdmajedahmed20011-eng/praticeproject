@@ -1,63 +1,82 @@
+/* ============================================================
+   LUXEAURA — PREMIUM DARK FOOTER
+   ============================================================ */
+
 .footer {
-  background-color: var(--background);
-  color: var(--foreground);
-  padding: 80px 40px 40px 40px;
-  border-top: 1px solid rgba(0,0,0,0.05);
+  background: var(--charcoal);
+  color: rgba(255, 255, 255, 0.85);
+  padding: 80px 40px 0 40px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1.5fr 1fr 1fr 1.2fr;
+  gap: 48px;
   max-width: var(--page-max-width);
-  margin: 0 auto;
-  margin-bottom: 60px;
+  margin: 0 auto 60px auto;
 }
 
+/* ── Brand Info ── */
 .brandInfo {
-  max-width: 300px;
+  max-width: 320px;
 }
 
 .logo {
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
-  letter-spacing: 0.15em;
+  letter-spacing: 0.18em;
   text-transform: uppercase;
+  color: #fff;
   margin-bottom: 20px;
   display: block;
 }
 
 .logo span {
   font-weight: 300;
+  color: var(--gold);
 }
 
 .brandDescription {
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #666;
-  margin-bottom: 20px;
+  font-size: 0.85rem;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 24px;
 }
 
 .socialLinks {
   display: flex;
-  gap: 15px;
+  gap: 12px;
 }
 
 .socialIcon {
-  color: var(--foreground);
-  transition: opacity 0.3s ease;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.6);
+  transition: all var(--duration-fast) ease;
 }
 
 .socialIcon:hover {
-  opacity: 0.6;
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+  transform: translateY(-2px);
 }
 
+/* ── Columns ── */
 .column h4 {
-  font-size: 0.95rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
   font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  margin-bottom: 25px;
+  letter-spacing: 0.12em;
+  color: #fff;
+  margin-bottom: 24px;
 }
 
 .linkList {
@@ -67,29 +86,129 @@
 }
 
 .linkList li {
-  margin-bottom: 15px;
+  margin-bottom: 14px;
 }
 
 .linkList a {
-  font-size: 0.9rem;
-  color: #666;
-  transition: color 0.3s ease;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color var(--duration-fast) ease;
 }
 
 .linkList a:hover {
-  color: var(--foreground);
+  color: var(--gold);
 }
 
-.bottom {
-  text-align: center;
-  padding-top: 40px;
-  border-top: 1px solid rgba(0,0,0,0.05);
-  font-size: 0.8rem;
-  color: #888;
+/* ── Contact ── */
+.contactList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.contactItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.contactItem svg {
+  flex-shrink: 0;
+  margin-top: 2px;
+  color: var(--gold);
+}
+
+/* ── Payment Section ── */
+.paymentSection {
   max-width: var(--page-max-width);
   margin: 0 auto;
+  padding: 32px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
+.paymentLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.paymentIcons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.paymentBadge {
+  padding: 6px 14px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-sm);
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* ── Bottom Bar ── */
+.bottom {
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 24px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.bottom p {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+}
+
+.bottomLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.bottomLinks a {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.35);
+  transition: color var(--duration-fast) ease;
+}
+
+.bottomLinks a:hover {
+  color: var(--gold);
+}
+
+.backToTop {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-full);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(255, 255, 255, 0.5);
+  transition: all var(--duration-fast) ease;
+}
+
+.backToTop:hover {
+  background: var(--gold);
+  border-color: var(--gold);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+/* ── Responsive ── */
 @media (max-width: 1024px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
@@ -98,10 +217,20 @@
 
 @media (max-width: 768px) {
   .footer {
-    padding: 60px 20px 30px 20px;
+    padding: 60px 20px 0 20px;
   }
   .grid {
     grid-template-columns: 1fr;
-    gap: 30px;
+    gap: 36px;
+  }
+  .bottom {
+    flex-direction: column;
+    text-align: center;
+  }
+  .bottomLinks {
+    justify-content: center;
+  }
+  .paymentSection {
+    flex-direction: column;
   }
 }

@@ -1,0 +1,158 @@
+.section {
+  padding: 100px 40px;
+  background: var(--background-secondary);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 56px;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.sectionTitle {
+  font-family: var(--font-heading);
+  font-size: 2.4rem;
+  font-weight: 400;
+  color: var(--foreground);
+}
+
+.carousel {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.navBtn {
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--ash);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--foreground);
+  transition: all var(--duration-fast) ease;
+  background: var(--background);
+}
+
+.navBtn:hover {
+  background: var(--foreground);
+  color: var(--background);
+  border-color: var(--foreground);
+}
+
+.cardWrapper {
+  flex: 1;
+  overflow: hidden;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+}
+
+.card {
+  width: 100%;
+  text-align: center;
+  padding: 0 16px;
+}
+
+.quoteIcon {
+  color: var(--gold);
+  opacity: 0.3;
+  margin: 0 auto 20px;
+}
+
+.stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 24px;
+}
+
+.text {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: var(--foreground-muted);
+  font-style: italic;
+  margin-bottom: 32px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  border: 2px solid var(--gold);
+}
+
+.authorName {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--foreground);
+  text-align: left;
+}
+
+.authorRole {
+  font-size: 0.75rem;
+  color: var(--foreground-light);
+  text-align: left;
+}
+
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 40px;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--ash);
+  transition: all var(--duration-normal) ease;
+  border: none;
+  padding: 0;
+}
+
+.dotActive {
+  background: var(--gold);
+  width: 24px;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 60px 16px;
+  }
+  .navBtn {
+    display: none;
+  }
+  .sectionTitle {
+    font-size: 1.8rem;
+  }
+  .text {
+    font-size: 0.95rem;
+  }
+}

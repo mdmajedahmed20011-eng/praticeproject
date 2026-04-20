@@ -1,66 +1,139 @@
-.newsletter {
-  padding: 80px 20px;
-  background-color: #fcfcfc;
-  border-top: 1px solid rgba(0,0,0,0.05);
-  text-align: center;
+.section {
+  position: relative;
+  padding: 120px 24px;
+  overflow: hidden;
+}
+
+.bgImage {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.bgImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 2;
 }
 
 .content {
+  position: relative;
+  z-index: 3;
   max-width: 600px;
   margin: 0 auto;
+  text-align: center;
+  color: #fff;
+}
+
+.giftIcon {
+  color: var(--gold);
+  margin-bottom: 20px;
+}
+
+.label {
+  font-size: 0.7rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--gold-light);
+  font-weight: 600;
+  display: block;
+  margin-bottom: 12px;
 }
 
 .title {
-  font-size: 1.5rem;
+  font-family: var(--font-heading);
+  font-size: 2.2rem;
   font-weight: 400;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-bottom: 15px;
+  margin-bottom: 16px;
+  line-height: 1.2;
 }
 
 .description {
   font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 30px;
-  line-height: 1.6;
+  line-height: 1.7;
+  color: rgba(255, 255, 255, 0.75);
+  margin-bottom: 36px;
 }
 
 .form {
+  width: 100%;
+}
+
+.inputWrapper {
   display: flex;
-  gap: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(8px);
+  overflow: hidden;
 }
 
 .input {
   flex: 1;
-  padding: 15px 20px;
-  border: 1px solid #ddd;
+  padding: 16px 20px;
+  border: none;
   background: transparent;
+  color: #fff;
   font-size: 0.9rem;
+  font-family: var(--font-body);
   outline: none;
-  transition: border-color 0.3s ease;
 }
 
-.input:focus {
-  border-color: #000;
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .button {
-  background: var(--foreground);
-  color: var(--background);
-  padding: 15px 30px;
-  font-size: 0.85rem;
+  padding: 16px 32px;
+  background: var(--gold);
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-weight: 500;
-  transition: opacity 0.3s ease;
+  transition: background var(--duration-fast) ease;
+  flex-shrink: 0;
 }
 
 .button:hover {
-  opacity: 0.8;
+  background: var(--gold-dark);
 }
 
-@media (max-width: 480px) {
-  .form {
+.successMsg {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 20px;
+  background: rgba(45, 138, 78, 0.2);
+  border: 1px solid rgba(45, 138, 78, 0.4);
+  color: #6fdb8f;
+  font-size: 0.9rem;
+}
+
+.disclaimer {
+  font-size: 0.7rem;
+  color: rgba(255, 255, 255, 0.4);
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .section {
+    padding: 80px 16px;
+  }
+  .title {
+    font-size: 1.7rem;
+  }
+  .inputWrapper {
     flex-direction: column;
+  }
+  .button {
+    padding: 14px;
   }
 }

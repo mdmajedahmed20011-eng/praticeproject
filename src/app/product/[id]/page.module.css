@@ -249,5 +249,33 @@
   .productPage {
     grid-template-columns: 1fr;
     gap: 30px;
+    padding: 24px 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .imageGallery {
+    flex-direction: column-reverse;
+  }
+  .thumbnails {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .thumbnail {
+    width: 60px;
+    height: 75px;
+    flex-shrink: 0;
+  }
+  .title {
+    font-size: 1.6rem;
+  }
+  .actionRow {
+    flex-direction: column;
+    gap: 12px;
+  }
+  .buyNow {
+    background-color: #111;
+    border-color: #111;
   }
 }

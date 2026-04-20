@@ -1,13 +1,73 @@
+/* ============================================================
+   LUXEAURA — ADMIN LAYOUT (Premium + Responsive)
+   ============================================================ */
+
 .adminContainer {
   display: flex;
   min-height: 100vh;
-  background-color: #f8fafc;
+  background-color: #f1f5f9;
 }
 
-/* Sidebar */
+/* ── Mobile Header Bar ── */
+.mobileHeader {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 56px;
+  background: #0f172a;
+  color: #f8fafc;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  z-index: 200;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.mobileTitle {
+  font-size: 1.1rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+}
+
+.mobileTitle span {
+  font-weight: 700;
+  color: #38bdf8;
+}
+
+.hamburger {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #f8fafc;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.hamburger:hover {
+  background: rgba(255,255,255,0.1);
+}
+
+/* ── Overlay ── */
+.overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 250;
+  animation: fadeIn 0.2s ease;
+}
+
+/* ── Sidebar ── */
 .sidebar {
   width: 260px;
-  background-color: #0f172a;
+  background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%);
   color: #f8fafc;
   display: flex;
   flex-direction: column;
@@ -16,16 +76,20 @@
   left: 0;
   top: 0;
   border-right: 1px solid #1e293b;
-  z-index: 100;
+  z-index: 300;
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .brand {
-  padding: 30px 20px;
-  border-bottom: 1px solid #1e293b;
+  padding: 28px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .brand h2 {
-  font-size: 1.5rem;
+  font-size: 1.4rem;
   letter-spacing: 0.1em;
   font-weight: 300;
   margin: 0;
@@ -36,34 +100,85 @@
   color: #38bdf8;
 }
 
+.closeSidebar {
+  display: none;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.5);
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.closeSidebar:hover {
+  background: rgba(255,255,255,0.1);
+  color: #fff;
+}
+
 .nav {
-  padding: 20px 0;
+  padding: 16px 0;
   display: flex;
   flex-direction: column;
   flex: 1;
+  overflow-y: auto;
 }
 
 .navLink {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px 24px;
-  color: #cbd5e1;
+  padding: 14px 24px;
+  color: #94a3b8;
   text-decoration: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
   transition: all 0.2s ease;
+  border-left: 3px solid transparent;
+  margin: 1px 0;
 }
 
 .navLink:hover {
-  background-color: #1e293b;
-  color: #fff;
-  border-left: 3px solid #38bdf8;
+  background-color: rgba(255,255,255,0.04);
+  color: #e2e8f0;
+  border-left-color: rgba(56, 189, 248, 0.3);
+}
+
+.navLinkActive {
+  background-color: rgba(56, 189, 248, 0.08);
+  color: #38bdf8;
+  border-left-color: #38bdf8;
+  font-weight: 600;
 }
 
 .bottomNav {
-  padding: 20px;
-  border-top: 1px solid #1e293b;
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.viewStoreBtn {
+  display: block;
+  text-align: center;
+  padding: 10px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.viewStoreBtn:hover {
+  background: rgba(56, 189, 248, 0.1);
 }
 
 .logoutBtn {
@@ -76,9 +191,9 @@
   color: #f87171;
   padding: 12px;
   cursor: pointer;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 500;
-  border-radius: 6px;
+  border-radius: 8px;
   transition: background 0.2s;
 }
 
@@ -86,9 +201,64 @@
   background-color: rgba(248, 113, 113, 0.1);
 }
 
-/* Main Content */
+/* ── Main Content ── */
 .mainContent {
   flex: 1;
-  margin-left: 260px; /* Offset for fixed sidebar */
-  padding: 40px;
+  margin-left: 260px;
+  padding: 32px;
+  min-height: 100vh;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 1024px) {
+  .mainContent {
+    padding: 24px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobileHeader {
+    display: flex;
+  }
+
+  .overlay {
+    display: block;
+  }
+
+  .sidebar {
+    transform: translateX(-100%);
+    box-shadow: 4px 0 24px rgba(0,0,0,0.3);
+    width: 280px;
+  }
+  
+  .sidebarOpen {
+    transform: translateX(0);
+  }
+
+  .closeSidebar {
+    display: flex;
+  }
+
+  .mainContent {
+    margin-left: 0;
+    padding: 72px 16px 24px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .sidebar {
+    width: 100%;
+  }
+  
+  .mainContent {
+    padding: 68px 12px 16px 12px;
+  }
 }

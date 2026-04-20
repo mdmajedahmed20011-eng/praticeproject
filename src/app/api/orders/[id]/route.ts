@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/authOptions';
 
-export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     const session = await getServerSession(authOptions);
     if (!session?.user) {
@@ -11,8 +11,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     const { id } = await params;
-    const data = await req.json();
-    const { status, trackingId, adminNotes } = data;
+    const { status, trackingId, adminNotes } = await req.json();
 
     const order = await prisma.order.update({
       where: { id },
@@ -28,4 +27,8 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     console.error('Error updating order:', error);
     return NextResponse.json({ error: 'Failed to update order' }, { status: 500 });
   }
+}
+
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
+  return PATCH(req, { params });
 }

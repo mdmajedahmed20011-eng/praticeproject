@@ -1,0 +1,47 @@
+.page { background: var(--background); }
+
+.hero { position: relative; height: 50vh; min-height: 400px; overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.heroImg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.heroOverlay { position: relative; z-index: 2; text-align: center; color: #fff; padding: 0 24px; }
+.hero::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 1; }
+.heroOverlay { z-index: 2; }
+.label { font-size: 0.7rem; letter-spacing: 0.25em; text-transform: uppercase; color: var(--gold-light); font-weight: 600; display: block; margin-bottom: 12px; }
+.heroTitle { font-family: var(--font-heading); font-size: 3rem; font-weight: 400; max-width: 600px; line-height: 1.2; }
+
+.sectionTitle { font-family: var(--font-heading); font-size: 2.2rem; font-weight: 400; text-align: center; margin-bottom: 48px; }
+
+.missionSection { padding: 80px 40px; max-width: 800px; margin: 0 auto; text-align: center; }
+.missionText { font-size: 1.1rem; line-height: 1.9; color: var(--foreground-muted); }
+
+.valuesSection { padding: 0 40px 80px; max-width: var(--page-max-width); margin: 0 auto; }
+.valuesGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; }
+.valueCard { text-align: center; padding: 32px 24px; border: 1px solid rgba(0,0,0,0.06); transition: all var(--duration-normal) ease; }
+.valueCard:hover { border-color: var(--gold); box-shadow: var(--shadow-gold); transform: translateY(-4px); }
+.valueIcon { color: var(--gold); margin-bottom: 20px; }
+.valueCard h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; margin-bottom: 10px; }
+.valueCard p { font-size: 0.85rem; color: var(--foreground-muted); line-height: 1.6; }
+
+.timelineSection { padding: 80px 40px; background: var(--cream); }
+.timeline { max-width: 700px; margin: 0 auto; position: relative; padding-left: 40px; }
+.timeline::before { content: ''; position: absolute; left: 12px; top: 0; bottom: 0; width: 2px; background: var(--ash); }
+.timelineItem { display: flex; align-items: flex-start; gap: 24px; margin-bottom: 40px; position: relative; }
+.timelineYear { font-family: var(--font-heading); font-size: 1.2rem; font-weight: 500; color: var(--gold); min-width: fit-content; position: absolute; left: -40px; }
+.timelineDot { position: absolute; left: -34px; top: 8px; width: 10px; height: 10px; border-radius: 50%; background: var(--gold); border: 2px solid #fff; z-index: 1; }
+.timelineContent h3 { font-family: var(--font-body); font-size: 1rem; font-weight: 600; margin-bottom: 6px; }
+.timelineContent p { font-size: 0.85rem; color: var(--foreground-muted); line-height: 1.6; }
+
+@media (max-width: 768px) {
+  .heroTitle { font-size: 2rem; }
+  .valuesGrid { grid-template-columns: repeat(2, 1fr); }
+  .missionSection, .valuesSection { padding-left: 20px; padding-right: 20px; }
+  .timeline { padding-left: 30px; }
+  .timelineItem { gap: 16px; margin-bottom: 30px; }
+  .timelineYear { position: static; margin-bottom: 4px; display: block; }
+  .timelineDot { left: -22px; }
+  .timeline::before { left: 9px; }
+}
+@media (max-width: 480px) { 
+  .valuesGrid { grid-template-columns: 1fr; } 
+  .sectionTitle { font-size: 1.8rem; }
+  .hero { height: 40vh; }
+}

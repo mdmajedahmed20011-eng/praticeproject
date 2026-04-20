@@ -1,16 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
-import { Plus, Search, Edit, Trash2, X } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Plus, Search, Edit, Trash2, Filter, ChevronDown, CheckSquare, Square } from 'lucide-react';
 import styles from './page.module.css';
-
-// Dynamically import react-quill to avoid SSR issues
-const ReactQuill = dynamic(() => import('react-quill'), { 
-  ssr: false,
-  loading: () => <p>Loading editor...</p>
-});
-import 'react-quill/dist/quill.snow.css';
 
 interface Product {
   id: string;
@@ -22,7 +15,6 @@ interface Product {
   images: string[];
   collectionId: string | null;
   collection?: { name: string };
-  // Add other fields as needed
 }
 
 interface Collection {
@@ -31,143 +23,82 @@ interface Collection {
 }
 
 export default function AdminProductsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
   const [products, setProducts] = useState<Product[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
-  // Modal state
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  // Filtering states
+  const [search, setSearch] = useState(searchParams.get('q') || '');
+  const [collectionFilter, setCollectionFilter] = useState(searchParams.get('collectionId') || 'all');
+  const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
+  const [stockFilter, setStockFilter] = useState(searchParams.get('stock') || 'all');
 
-  // Form state
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [price, setPrice] = useState<number | ''>('');
-  const [compareAtPrice, setCompareAtPrice] = useState<number | ''>('');
-  const [stock, setStock] = useState<number>(0);
-  const [imagesText, setImagesText] = useState('');
-  const [colorsText, setColorsText] = useState('');
-  const [sizesText, setSizesText] = useState('');
-  const [collectionId, setCollectionId] = useState('');
-  const [isDraft, setIsDraft] = useState(false);
-  const [isFeatured, setIsFeatured] = useState(false);
+  // Multi-select
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  const fetchData = async () => {
+  const fetchProducts = useCallback(async () => {
     setIsLoading(true);
     try {
-      const [prodRes, collRes] = await Promise.all([
-        fetch('/api/products'),
-        fetch('/api/collections')
-      ]);
-      const prodData = await prodRes.json();
-      const collData = await collRes.json();
-      setProducts(prodData);
-      setCollections(collData);
+      const params = new URLSearchParams();
+      if (search) params.set('q', search);
+      if (collectionFilter !== 'all') params.set('collectionId', collectionFilter);
+      if (statusFilter !== 'all') params.set('status', statusFilter);
+      if (stockFilter !== 'all') params.set('stock', stockFilter);
+
+      const res = await fetch(`/api/products?${params.toString()}`);
+      const data = await res.json();
+      setProducts(data);
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error('Error fetching products:', error);
     } finally {
       setIsLoading(false);
     }
+  }, [search, collectionFilter, statusFilter, stockFilter]);
+
+  const fetchCollections = async () => {
+    try {
+      const res = await fetch('/api/collections');
+      const data = await res.json();
+      setCollections(data);
+    } catch (e) { console.error(e); }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchCollections();
   }, []);
 
-  const openModal = async (product?: Product) => {
-    if (product) {
-      // Need to fetch full product details to be sure we have everything
-      try {
-        const res = await fetch(`/api/products/${product.id}`);
-        const fullProduct = await res.json();
-        
-        setEditingProduct(fullProduct);
-        setTitle(fullProduct.title);
-        setDescription(fullProduct.description);
-        setPrice(fullProduct.price);
-        setCompareAtPrice(fullProduct.compareAtPrice || '');
-        setStock(fullProduct.stock);
-        setImagesText(fullProduct.images.join(', '));
-        setColorsText(fullProduct.colors ? fullProduct.colors.join(', ') : '');
-        setSizesText(fullProduct.sizes ? fullProduct.sizes.join(', ') : '');
-        setCollectionId(fullProduct.collectionId || '');
-        setIsDraft(fullProduct.isDraft);
-        setIsFeatured(fullProduct.isFeatured);
-      } catch (e) {
-        console.error(e);
-      }
-    } else {
-      setEditingProduct(null);
-      setTitle('');
-      setDescription('');
-      setPrice('');
-      setCompareAtPrice('');
-      setStock(10);
-      setImagesText('');
-      setColorsText('');
-      setSizesText('');
-      setCollectionId('');
-      setIsDraft(false);
-      setIsFeatured(false);
-    }
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    // Parse comma-separated strings to arrays
-    const imagesArray = imagesText.split(',').map(s => s.trim()).filter(Boolean);
-    const colorsArray = colorsText.split(',').map(s => s.trim()).filter(Boolean);
-    const sizesArray = sizesText.split(',').map(s => s.trim()).filter(Boolean);
-
-    const data = {
-      title,
-      description,
-      price: Number(price),
-      compareAtPrice: compareAtPrice ? Number(compareAtPrice) : null,
-      stock: Number(stock),
-      images: imagesArray,
-      colors: colorsArray,
-      sizes: sizesArray,
-      collectionId: collectionId || null,
-      isDraft,
-      isFeatured
-    };
-
-    const url = editingProduct ? `/api/products/${editingProduct.id}` : '/api/products';
-    const method = editingProduct ? 'PUT' : 'POST';
-
-    try {
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      
-      if (!res.ok) throw new Error('Failed to save');
-      
-      closeModal();
-      fetchData();
-    } catch (error) {
-      console.error(error);
-      alert('Error saving product');
-    }
-  };
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchProducts();
+    }, 300); // Debounce search
+    return () => clearTimeout(timer);
+  }, [fetchProducts]);
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this product?')) return;
     try {
-      await fetch(`/api/products/${id}`, { method: 'DELETE' });
-      fetchData();
+      const res = await fetch(`/api/products/${id}`, { method: 'DELETE' });
+      if (res.ok) fetchProducts();
     } catch (e) {
-      console.error(e);
       alert('Error deleting product');
     }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.length === products.length) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(products.map(p => p.id));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
   };
 
   return (
@@ -177,168 +108,169 @@ export default function AdminProductsPage() {
           <h1>Products</h1>
           <p>Manage your inventory, prices, and stock levels.</p>
         </div>
-        <button className={styles.addBtn} onClick={() => openModal()}>
-          <Plus size={18} />
-          Add Product
-        </button>
+        <div className={styles.headerActions}>
+          <button className={styles.exportBtn}>Export CSV</button>
+          <button className={styles.addBtn} onClick={() => router.push('/admin/products/new')}>
+            <Plus size={18} /> Add Product
+          </button>
+        </div>
       </div>
 
+      {/* ── Summary Bar ── */}
+      <div className={styles.summaryBar}>
+        <div className={styles.stat}><strong>{products.length}</strong> Total Products</div>
+        <div className={styles.stat}><strong>{products.filter(p => p.isDraft).length}</strong> Drafts</div>
+        <div className={styles.stat}><strong>{products.filter(p => p.stock < 5).length}</strong> Low Stock</div>
+      </div>
+
+      {/* ── Search & Filter Panel ── */}
       <div className={styles.controls}>
         <div className={styles.searchBox}>
           <Search size={18} color="#64748b" />
-          <input type="text" placeholder="Search products..." />
+          <input 
+            type="text" 
+            placeholder="Search title, SKU or tags..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
         </div>
+        
         <div className={styles.filters}>
-          <select>
-            <option>All Collections</option>
-            {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+          <div className={styles.filterGroup}>
+            <Filter size={14} />
+            <select value={collectionFilter} onChange={e => setCollectionFilter(e.target.value)}>
+              <option value="all">All Collections</option>
+              {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+            </select>
+          </div>
+
+          <select value={statusFilter} onChange={e => setStatusFilter(e.target.value)}>
+            <option value="all">Any Status</option>
+            <option value="active">Published</option>
+            <option value="draft">Draft</option>
           </select>
-          <select>
-            <option>Latest Added</option>
-            <option>Price: Low to High</option>
-            <option>Price: High to Low</option>
+
+          <select value={stockFilter} onChange={e => setStockFilter(e.target.value)}>
+            <option value="all">All Inventory</option>
+            <option value="in">In Stock</option>
+            <option value="low">Low Stock</option>
+            <option value="out">Out of Stock</option>
           </select>
         </div>
       </div>
 
+      {/* ── Bulk Actions (Sticky) ── */}
+      {selectedIds.length > 0 && (
+        <div className={styles.bulkActions}>
+           <span>{selectedIds.length} products selected</span>
+           <div className={styles.bulkButtons}>
+             <button className={styles.bulkBtn}>Publish</button>
+             <button className={styles.bulkBtn}>Draft</button>
+             <button className={`${styles.bulkBtn} ${styles.danger}`}>Delete</button>
+           </div>
+        </div>
+      )}
+
+      {/* ── Table Container ── */}
       <div className={styles.tableCard}>
         {isLoading ? (
-          <div style={{ padding: '2rem', textAlign: 'center' }}>Loading products...</div>
+          <div className={styles.loadingState}>
+            <div className={styles.spinner} />
+            <p>Syncing Inventory...</p>
+          </div>
         ) : (
           <table className={styles.table}>
             <thead>
               <tr>
+                <th width="40" onClick={toggleSelectAll} style={{ cursor: 'pointer' }}>
+                  {selectedIds.length === products.length && products.length > 0 
+                    ? <CheckSquare size={18} color="#0ea5e9" /> 
+                    : <Square size={18} color="#cbd5e1" />}
+                </th>
                 <th>Product</th>
                 <th>Collection</th>
                 <th>Price</th>
-                <th>Stock</th>
+                <th>Inventory</th>
                 <th>Status</th>
-                <th>Actions</th>
+                <th align="right">Actions</th>
               </tr>
             </thead>
             <tbody>
               {products.map(product => (
-                <tr key={product.id}>
+                <tr key={product.id} className={selectedIds.includes(product.id) ? styles.selectedRow : ''}>
+                  <td>
+                    <div onClick={() => toggleSelect(product.id)} style={{ cursor: 'pointer' }}>
+                       {selectedIds.includes(product.id) 
+                         ? <CheckSquare size={18} color="#0ea5e9" /> 
+                         : <Square size={18} color="#cbd5e1" />}
+                    </div>
+                  </td>
                   <td className={styles.productCell}>
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img 
                       src={product.images[0] || "https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=100&q=80"} 
                       alt={product.title} 
-                      className={styles.thumb} 
+                      className={styles.pThumb} 
                     />
                     <div className={styles.productInfo}>
-                      <p className={styles.productTitle}>{product.title}</p>
+                      <span className={styles.pTitle}>{product.title}</span>
+                      <span className={styles.pSku}>{product.id.slice(0, 8).toUpperCase()}</span>
                     </div>
                   </td>
-                  <td>{product.collection?.name || '-'}</td>
-                  <td style={{ fontWeight: 600 }}>Tk {product.price}</td>
                   <td>
-                    <span className={styles.stockBadge} data-stock={product.stock > 10 ? "high" : "low"}>
-                      {product.stock} in stock
+                    <span className={styles.collectionBadge}>
+                      {product.collection?.name || 'Uncategorized'}
                     </span>
                   </td>
                   <td>
-                    <span suppressHydrationWarning className={product.isDraft ? styles.draftBadge : styles.activeBadge}>
-                      {product.isDraft ? 'Draft' : 'Published'}
-                    </span>
+                    <div className={styles.priceInfo}>
+                      <span className={styles.currentPrice}>৳{product.price}</span>
+                    </div>
                   </td>
                   <td>
+                    <div className={styles.inventoryInfo}>
+                      <span 
+                        className={styles.stockDot} 
+                        style={{ backgroundColor: product.stock === 0 ? '#ef4444' : product.stock < 5 ? '#f59e0b' : '#22c55e' }}
+                      />
+                      <span>{product.stock} in stock</span>
+                    </div>
+                  </td>
+                  <td>
+                    <span className={product.isDraft ? styles.badgeDraft : styles.badgeActive}>
+                      {product.isDraft ? 'Draft' : 'Live'}
+                    </span>
+                  </td>
+                  <td align="right">
                     <div className={styles.actions}>
-                      <button className={styles.iconBtn} onClick={() => openModal(product)}><Edit size={16} /></button>
-                      <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(product.id)}><Trash2 size={16} /></button>
+                      <button className={styles.iconBtn} onClick={() => router.push(`/admin/products/${product.id}`)}>
+                        <Edit size={16} />
+                      </button>
+                      <button className={`${styles.iconBtn} ${styles.danger}`} onClick={() => handleDelete(product.id)}>
+                        <Trash2 size={16} />
+                      </button>
                     </div>
                   </td>
                 </tr>
               ))}
               {products.length === 0 && (
                 <tr>
-                  <td colSpan={6} style={{ textAlign: 'center', padding: '2rem' }}>No products found</td>
+                  <td colSpan={7} className={styles.emptyState}>
+                    <div className={styles.emptyContent}>
+                       <Search size={48} />
+                       <p>No products found matching your criteria</p>
+                       <button onClick={() => { setSearch(''); setCollectionFilter('all'); setStatusFilter('all'); setStockFilter('all'); }}>
+                         Clear all filters
+                       </button>
+                    </div>
+                  </td>
                 </tr>
               )}
             </tbody>
           </table>
         )}
       </div>
-
-      {isModalOpen && (
-        <div className={styles.modalOverlay}>
-          <div className={styles.modal}>
-            <div className={styles.modalHeader}>
-              <h2>{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
-              <button className={styles.closeBtn} onClick={closeModal}><X size={24} /></button>
-            </div>
-            
-            <form onSubmit={handleSubmit} className={styles.formGrid}>
-               <div className={styles.formGroup}>
-                 <label>Title</label>
-                 <input type="text" value={title} onChange={e => setTitle(e.target.value)} required />
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Collection</label>
-                 <select value={collectionId} onChange={e => setCollectionId(e.target.value)}>
-                   <option value="">No Collection</option>
-                   {collections.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                 </select>
-               </div>
-
-               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                 <label>Description</label>
-                 <div className={styles.quillContainer}>
-                   <ReactQuill theme="snow" value={description} onChange={setDescription} />
-                 </div>
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Price</label>
-                 <input type="number" value={price} onChange={e => setPrice(Number(e.target.value))} required min="0" />
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Compare at Price (Optional)</label>
-                 <input type="number" value={compareAtPrice} onChange={e => setCompareAtPrice(e.target.value ? Number(e.target.value) : '')} min="0" />
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Stock</label>
-                 <input type="number" value={stock} onChange={e => setStock(Number(e.target.value))} required min="0" />
-               </div>
-
-               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                 <label>Images (Comma-separated URLs)</label>
-                 <input type="text" value={imagesText} onChange={e => setImagesText(e.target.value)} required placeholder="url1.jpg, url2.jpg" />
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Sizes (Comma-separated)</label>
-                 <input type="text" value={sizesText} onChange={e => setSizesText(e.target.value)} placeholder="S, M, L, XL" />
-               </div>
-
-               <div className={styles.formGroup}>
-                 <label>Colors (Comma-separated hex or names)</label>
-                 <input type="text" value={colorsText} onChange={e => setColorsText(e.target.value)} placeholder="Black, #FFFFFF, Navy" />
-               </div>
-
-               <div className={styles.formGroup} style={{ gridColumn: '1 / -1' }}>
-                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                   <input type="checkbox" checked={isDraft} onChange={e => setIsDraft(e.target.checked)} />
-                   Save as Draft
-                 </label>
-                 <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem' }}>
-                   <input type="checkbox" checked={isFeatured} onChange={e => setIsFeatured(e.target.checked)} />
-                   Mark as Featured
-                 </label>
-               </div>
-
-               <div className={styles.formActions} style={{ gridColumn: '1 / -1' }}>
-                 <button type="submit" className={styles.submitBtn}>
-                   Save Product
-                 </button>
-               </div>
-            </form>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
+

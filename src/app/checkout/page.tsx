@@ -106,7 +106,7 @@ export default function CheckoutPage() {
         totalAmount: grandTotal,
         paymentMethod: paymentMethod === 'cod' ? 'COD' : 'ONLINE',
         items: items.map(i => ({
-          id: i.id,
+          id: i.productId, // Use the actual Product ID for database relations
           quantity: i.quantity,
           price: i.price,
           selectedSize: i.size,
@@ -122,14 +122,17 @@ export default function CheckoutPage() {
         body: JSON.stringify(orderPayload)
       });
 
-      if (!res.ok) throw new Error('Failed to place order');
+      if (!res.ok) {
+        const errorData = await res.text();
+        throw new Error(errorData || 'Failed to place order');
+      }
 
       clearCart();
       alert('Order placed successfully! Redirecting...');
       router.push('/');
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
-      alert('There was an error placing your order. Please try again.');
+      alert(`Order Failed: ${error.message}. Please try again.`);
       setIsSubmitting(false);
     }
   };

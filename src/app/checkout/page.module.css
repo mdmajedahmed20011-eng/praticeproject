@@ -227,7 +227,7 @@
 
 .submitBtn {
   width: 100%;
-  background-color: var(--accent);
+  background-color: #111;
   color: #fff;
   border: none;
   padding: 18px 0;

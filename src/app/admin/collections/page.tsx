@@ -137,50 +137,56 @@ export default function CollectionsPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={styles.collectionsWrapper}>
       <div className={styles.header}>
-        <h1>Collections</h1>
+        <div className={styles.titleArea}>
+          <h1>Collections</h1>
+          <p>Organize your products into curated, high-impact categories.</p>
+        </div>
         <button className={styles.createBtn} onClick={() => openModal()}>
-          <Plus size={20} />
-          Create Collection
+          <Plus size={20} /> Create Collection
         </button>
       </div>
 
       {isLoading ? (
-        <p>Loading collections...</p>
+        <div style={{ textAlign: 'center', padding: '100px', color: '#64748b' }}>Orchestrating Collections...</div>
       ) : collections.length === 0 ? (
-        <p>No collections found.</p>
+        <div style={{ textAlign: 'center', padding: '100px', background: '#f8fafc', borderRadius: '24px', border: '2px dashed #e2e8f0' }}>
+           <p style={{ margin: 0, fontWeight: 600, color: '#64748b' }}>No collections found yet. Start curating your store.</p>
+        </div>
       ) : (
         <div className={styles.grid}>
           {collections.map((collection) => (
             <div key={collection.id} className={styles.card}>
-              {collection.coverImage && (
-                <div style={{ height: '150px', overflow: 'hidden', borderTopLeftRadius: '12px', borderTopRightRadius: '12px', margin: '-1.5rem -1.5rem 1rem -1.5rem' }}>
-                  <img src={collection.coverImage} alt={collection.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                </div>
-              )}
-              <div className={styles.cardHeader}>
-                <h3>{collection.name}</h3>
-                <span className={`${styles.badge} ${!collection.isActive ? styles.inactive : ''}`}>
+              <div className={styles.imageOverlay}>
+                <img 
+                  src={collection.coverImage || 'https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=1000'} 
+                  alt={collection.name} 
+                  className={styles.coverImage} 
+                />
+                <span className={`${styles.statusRibbon} ${collection.isActive ? styles.activeRibbon : styles.draftRibbon}`}>
                   {collection.isActive ? 'Active' : 'Draft'}
                 </span>
               </div>
-              <p className={styles.description}>{collection.description || 'No description provided.'}</p>
               
-              <div className={styles.stats}>
-                <div className={styles.stat}>
-                  <Package size={16} />
-                  <span>{collection._count?.products || 0} Products</span>
+              <div className={styles.cardBody}>
+                <h3 className={styles.cardTitle}>{collection.name}</h3>
+                <p className={styles.description}>{collection.description || 'No description provided.'}</p>
+                
+                <div className={styles.cardFooter}>
+                  <div className={styles.productCount}>
+                    <Package size={16} />
+                    <span>{collection._count?.products || 0} Products</span>
+                  </div>
+                  <div className={styles.actions}>
+                    <button className={styles.iconBtn} onClick={() => openModal(collection)}>
+                      <Edit size={16} />
+                    </button>
+                    <button className={`${styles.iconBtn} ${styles.dangerBtn}`} onClick={() => handleDelete(collection.id)}>
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
                 </div>
-              </div>
-
-              <div className={styles.actions}>
-                <button className={styles.editBtn} onClick={() => openModal(collection)}>
-                  <Edit size={16} /> Edit
-                </button>
-                <button className={styles.deleteBtn} onClick={() => handleDelete(collection.id)}>
-                  <Trash2 size={16} /> Delete
-                </button>
               </div>
             </div>
           ))}
@@ -191,70 +197,73 @@ export default function CollectionsPage() {
         <div className={styles.modalOverlay}>
           <div className={styles.modal}>
             <div className={styles.modalHeader}>
-              <h2>{editingCollection ? 'Edit Collection' : 'Create Collection'}</h2>
-              <button className={styles.closeBtn} onClick={closeModal}>&times;</button>
+              <h2 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 800 }}>{editingCollection ? 'Refine Collection' : 'New Collection'}</h2>
+              <button className={styles.closeBtn} onClick={closeModal} style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#64748b' }}>&times;</button>
             </div>
 
-            {error && <div style={{ color: 'red', marginBottom: '1rem', padding: '0.5rem', background: '#ffe4e6', borderRadius: '4px' }}>{error}</div>}
-
             <form onSubmit={handleSubmit}>
-              <div className={styles.formGroup}>
-                <label>Collection Name</label>
-                <input 
-                  type="text" 
-                  value={name} 
-                  onChange={handleNameChange} 
-                  required 
-                  placeholder="e.g. Summer Elements"
-                />
-              </div>
+              <div className={styles.modalBody}>
+                <div className={styles.formGroup}>
+                  <label>Title</label>
+                  <input 
+                    type="text" 
+                    className={styles.input}
+                    value={name} 
+                    onChange={handleNameChange} 
+                    required 
+                    placeholder="e.g. Luxury Timepieces"
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>Slug</label>
-                <input 
-                  type="text" 
-                  value={slug} 
-                  onChange={(e) => setSlug(e.target.value)} 
-                  required 
-                  placeholder="e.g. summer-elements"
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  <label>Handle (Slug)</label>
+                  <input 
+                    type="text" 
+                    className={styles.input}
+                    value={slug} 
+                    onChange={(e) => setSlug(e.target.value)} 
+                    required 
+                    placeholder="luxury-timepieces"
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>Description</label>
-                <textarea 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
-                  rows={3}
-                  placeholder="Brief description of the collection..."
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  <label>Description (Aspirational)</label>
+                  <textarea 
+                    className={styles.textarea}
+                    value={description} 
+                    onChange={(e) => setDescription(e.target.value)} 
+                    rows={3}
+                    placeholder="Explain the essence of this collection..."
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <label>Cover Image URL</label>
-                <input 
-                  type="text" 
-                  value={coverImage} 
-                  onChange={(e) => setCoverImage(e.target.value)} 
-                  placeholder="https://..."
-                />
-              </div>
+                <div className={styles.formGroup}>
+                  <label>Cover Media URL</label>
+                  <input 
+                    type="text" 
+                    className={styles.input}
+                    value={coverImage} 
+                    onChange={(e) => setCoverImage(e.target.value)} 
+                    placeholder="https://..."
+                  />
+                </div>
 
-              <div className={styles.formGroup}>
-                <div className={styles.checkboxGroup}>
+                <div className={styles.checkboxGroup} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                   <input 
                     type="checkbox" 
                     id="isActive"
                     checked={isActive} 
                     onChange={(e) => setIsActive(e.target.checked)} 
+                    style={{ width: '18px', height: '18px' }}
                   />
-                  <label htmlFor="isActive">Make Collection Active</label>
+                  <label htmlFor="isActive" style={{ fontSize: '0.9rem', fontWeight: 600, color: '#1e293b' }}>Published & Visible</label>
                 </div>
-              </div>
 
-              <button type="submit" className={styles.submitBtn} disabled={isSubmitting}>
-                {isSubmitting ? 'Saving...' : 'Save Collection'}
-              </button>
+                <button type="submit" className={styles.createBtn} disabled={isSubmitting} style={{ width: '100%', justifyContent: 'center', marginTop: '12px' }}>
+                  {isSubmitting ? 'Syncing...' : 'Save Collection'}
+                </button>
+              </div>
             </form>
           </div>
         </div>

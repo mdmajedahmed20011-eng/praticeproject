@@ -3,7 +3,9 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { Heart, Eye } from 'lucide-react';
+import Image from 'next/image';
 import QuickViewModal from '../QuickViewModal/QuickViewModal';
+import { useCart, CartItem } from '@/context/CartContext';
 import styles from './ProductCard.module.css';
 
 export interface ProductProps {
@@ -14,15 +16,35 @@ export interface ProductProps {
   stockStatus?: 'low' | 'normal';
   image: string;
   colors?: string[];
+  sizes?: string[];
 }
 
 export default function ProductCard({ product }: { product: ProductProps }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { addToCart } = useCart();
 
   const handleQuickView = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsModalOpen(true);
+  };
+
+  const handleQuickAdd = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    const cartItem: CartItem = {
+      id: `${product.id}-${product.sizes?.[0] || 'S'}-${product.colors?.[0] || 'any'}`,
+      productId: product.id,
+      title: product.title,
+      price: product.price,
+      image: product.image,
+      size: product.sizes?.[0] || 'Standard',
+      color: product.colors?.[0] || 'Original',
+      quantity: 1
+    };
+
+    addToCart(cartItem);
   };
 
   const discountPercentage = product.compareAtPrice 
@@ -32,17 +54,19 @@ export default function ProductCard({ product }: { product: ProductProps }) {
   return (
     <>
       <div className={styles.productCard}>
-        <Link href={`/product/${product.id}`} className={styles.imageWrapper} style={{ display: 'block' }}>
+        <Link href={`/product/${product.id}`} className={styles.imageWrapper} style={{ display: 'block', position: 'relative' }}>
           {/* Sale Badge overlay */}
           {product.compareAtPrice && product.price < product.compareAtPrice && (
             <div className={styles.saleBadge}>Sale</div>
           )}
 
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img 
+          <Image 
             src={product.image} 
             alt={product.title} 
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className={styles.productImage} 
+            style={{ objectFit: 'cover' }}
           />
           
           {/* Wishlist Heart Icon (Top Right) */}
@@ -75,6 +99,11 @@ export default function ProductCard({ product }: { product: ProductProps }) {
               </>
             )}
           </div>
+
+          {/* Quick Add Action */}
+          <button className={styles.quickAddButton} onClick={handleQuickAdd}>
+            Quick Add
+          </button>
 
           {/* Scarcity Bar */}
           {product.stockStatus === 'low' && (
